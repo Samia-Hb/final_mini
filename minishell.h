@@ -87,8 +87,8 @@ typedef struct queue
 }					t_queue;
 
 			//**Tokenization**/
-Token	**tokenize(char *input, int *token_count);
-Token	**add_token(Token **tokens, int *token_count, TokenType type, char *value);
+Token	**tokenize(char *input);
+Token	**add_token(Token **tokens, TokenType type, char *value);
 char	*handle_quote(char *str, char c);
 void print_token(Token *tokens);
 
@@ -96,6 +96,7 @@ void print_token(Token *tokens);
 char	**ft_split(char *s, char c);
 char	*ft_strjoin(char const *s1, char const *s2);
 char	*ft_strtrim(char *s1, char *set);
+char	*ft_substr(char *s, unsigned int start, size_t len);
 
 		    //pipex_utils
 char	*get_executable(char *command);

@@ -3,7 +3,6 @@
 int	main(void)
 {
 	char	*input;
-	int		token_count;
 	Token	**tokens;
 	Token	*current_token;
 
@@ -11,8 +10,7 @@ int	main(void)
 	while (1)
 	{
 		input = readline("Minishell$ ");
-		// check_input(input);
-		tokens = tokenize(input, &token_count);
+		tokens = tokenize(input);
 		current_token = *tokens;
 		print_token(*tokens);
 	}

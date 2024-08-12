@@ -18,9 +18,7 @@ char	*find_command_path(char **dir, char *command) // work
 		strcat(full_path, "/");
 		strcat(full_path, command);
 		if (access(full_path, X_OK) == 0)
-		{
 			return (full_path);
-		}
 		free(full_path);
 		i++;
 	}

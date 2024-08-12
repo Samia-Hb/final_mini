@@ -11,7 +11,8 @@ void print_token(Token *tokens)
 	}
 }
 
-char *handle_quote(char *str, char c) {
+char *handle_quote(char *str, char c)
+{
     int i = 1;
     int j = 0;
     char *word;
@@ -23,7 +24,7 @@ char *handle_quote(char *str, char c) {
         i++;
         j++;
     }
-    if (str[i] != c)
+    if (!(strchr(str[i] , c)))
 	{
         printf("Error: unclosed quote\n");
         exit(1);
