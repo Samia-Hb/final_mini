@@ -88,7 +88,7 @@ typedef struct queue
 
 			//**Tokenization**/
 Token	**tokenize(char *input);
-Token	**add_token(Token **tokens, TokenType type, char *value);
+void add_token(Token **tokens, TokenType type, const char *value);
 char	*handle_quote(char *str, char c);
 void print_token(Token *tokens);
 

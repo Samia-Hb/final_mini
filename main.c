@@ -4,15 +4,17 @@ int	main(void)
 {
 	char	*input;
 	Token	**tokens;
-	Token	*current_token;
 
 	tokens = NULL;
 	while (1)
 	{
 		input = readline("Minishell$ ");
 		tokens = tokenize(input);
-		current_token = *tokens;
-		print_token(*tokens);
+		while(*tokens)
+		{
+			printf("token_value  = %s token_type = %d\n", (*tokens)->value, (*tokens)->type);
+			(*tokens) = (*tokens)->next;
+		}
 	}
 
 	// t_stack *operator_stack = NULL;
