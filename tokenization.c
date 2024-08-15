@@ -1,10 +1,14 @@
 
 #include "minishell.h"
 
-Token *create_token(TokenType type, const char *value) {
-    Token *token = malloc(sizeof(Token));
-    if (!token) {
-        fprintf(stderr, "Error: Memory allocation failed\n");
+Token *create_token(TokenType type, const char *value)
+{
+    Token *token;
+	
+	token = malloc(sizeof(Token));
+    if (!token)
+	{
+        printf("Error: Memory allocation failed\n");
         exit(EXIT_FAILURE);
     }
     token->type = type;
@@ -13,31 +17,42 @@ Token *create_token(TokenType type, const char *value) {
     return token;
 }
 
-void add_token(Token **tokens, TokenType type, const char *value) {
-    Token *new_node = create_token(type, value);
-    if (!(*tokens)) {
+void add_token(Token **tokens, TokenType type, const char *value)
+{
+	Token	*new_node;
+	Token	*ptr;
+
+	new_node = create_token(type, value);
+    if (!(*tokens))
         *tokens = new_node;
-    } else {
-        Token *ptr = *tokens;
-        while (ptr->next) {
+    else
+	{
+        ptr = *tokens;
+        while (ptr->next)
+		{
             ptr = ptr->next;
         }
         ptr->next = new_node;
     }
 }
 
-void free_tokens(Token *tokens) {
-    Token *current = tokens;
+void free_tokens(Token *tokens)
+{
+    Token *current;
     Token *next;
-    while (current) {
+
+	current = tokens;
+    while (current)
+	{
         next = current->next;
         free(current->value);
         free(current);
         current = next;
-    }
+	}
 }
 
-int ft_is_separator(char c) {
+int ft_is_separator(char c)
+{
     return strchr("><| ()[]", c) != NULL;
 }
 
@@ -79,27 +94,28 @@ char *handle_Parentheses(char *str, char c)
     return word;
 }
 
-char *handle_quote(char *str, char c) {
-    int i = 1;
+char *handle_quote(char *str, char c)
+{
+	int i = 1;
     int j = 0;
     char *word;
 
-    // Move past the opening quote and count the length of the quoted string
-    while (str[i] && str[i] != c) {
-        if (str[i] == '\\' && str[i + 1] == c) {
+    while (str[i] && str[i] != c)
+	{
+        if (str[i] == '\\' && str[i + 1] == c)
             i += 2;
-        } else {
+        else
             i++;
-        }
         j++;
     }
-
-    if (str[i] != c) {
+    if (str[i] != c)
+	{
         fprintf(stderr, "Error: unclosed quote\n");
         exit(EXIT_FAILURE);
     }
     word = malloc(j + 3);
-    if (!word) {
+    if (!word)
+	{
         fprintf(stderr, "Error: memory allocation failed\n");
         exit(EXIT_FAILURE);
     }
@@ -107,7 +123,6 @@ char *handle_quote(char *str, char c) {
     strncpy(word + 1, str + 1, j);
     word[j + 1] = c;
     word[j + 2] = '\0';
-
     return word;
 }
 
@@ -147,45 +162,53 @@ Token **ft_append_identifier(char *input, Token **token_list, int *tmp, int *j) 
     int k = 0;
     char *value;
 
-    while (input[i] && !ft_is_separator(input[i])) {
-        if (input[i] == '"' || input[i] == '\'') {
+    while (input[i] && !ft_is_separator(input[i]))
+	{
+        if (input[i] == '"' || input[i] == '\'')
+		{
             *tmp = 0;
             return token_list;
         }
         i++;
     }
-
     value = malloc(i + 1);
-    if (!value) {
+    if (!value)
+	{
         fprintf(stderr, "Error: memory allocation failed\n");
         exit(EXIT_FAILURE);
     }
-    while (k < i) {
+    while (k < i)
+	{
         value[k] = input[k];
         k++;
     }
     value[k] = '\0';
-
     *j = i;
     add_token(token_list, get_token_type(value), value);
-    free(value);
+    free (value);
     return token_list;
 }
 
-char *char_to_string(char c, char c2) {
+char *char_to_string(char c, char c2)
+{
     char *string;
-    if (!c2) {
+
+    if (!c2)
+	{
         string = malloc(2 * sizeof(char));
-        if (!string) {
-            fprintf(stderr, "Error: memory allocation failed\n");
+        if (!string)
+		{
+            printf("Error: memory allocation failed\n");
             exit(EXIT_FAILURE);
         }
         string[0] = c;
         string[1] = '\0';
-    } else {
+    }
+	else
+	{
         string = malloc(3 * sizeof(char));
         if (!string) {
-            fprintf(stderr, "Error: memory allocation failed\n");
+            printf("Error: memory allocation failed\n");
             exit(EXIT_FAILURE);
         }
         string[0] = c;
@@ -197,8 +220,9 @@ char *char_to_string(char c, char c2) {
 
 int ft_strchr(char *string, char *delimiteur, int *l)
 {
-    int i;
-    char **splited;
+    int		i;
+    char	**splited;
+
     splited = ft_split(string, '\n');
     i = 0;
     if (!splited)
@@ -206,76 +230,90 @@ int ft_strchr(char *string, char *delimiteur, int *l)
         printf("Error\n");
         return (0);
     }
-
-    while(splited[i])
+    while (splited[i])
     {
-        *l += strlen(splited[i]) - 1;
+        *l += strlen(splited[i]) ;
         if (!strcmp(splited[i], delimiteur))
             return (1);
         i++;
     }
     return (0);
 }
-char *heredoc_token(char *input, int l)
-{
-    char *full_token;
-    int i;
 
-    i = 0;
-    full_token = malloc(l * sizeof(char));
-    if (full_token)
-        return NULL;
-    while(i < l)
-    {
-        full_token[i] = input[i];
+int find_delimiter_in_lines(char *string, char *delimiter, int *l)
+{
+    int     i;
+    char    **splitted;
+
+	i = 0;
+	while (string[i] && string [i] == '<' && string[i] == ' ')
+		i++;
+	l += i;
+    splitted = ft_split(string, '\n');
+    if (!splitted)
+	{
+        printf("Error\n");
+        return (0);
+    }
+	i = 0;
+    while (splitted[i])
+	{
+        *l = *l + strlen(splitted[i]);
+        if (!strcmp(splitted[i], delimiter))
+            return (1);
         i++;
     }
-    return full_token;
+    return (0);
+}
+
+char *heredoc_token(char *input, int l)
+{
+    char	*full_token;
+    int		i;
+
+	i = 0;
+    full_token = malloc(l * sizeof(char));
+    if (!full_token)
+        return NULL;
+    while (i < l)
+	{
+        full_token[i] = input[i];
+		i++;
+	}
+	return (full_token);
 }
 
 char *handle_heredoc(char *input)
 {
-    int i;
-    int j;
-    int k;
-    char *Delimiter;
-    int l;
+    int     i = 0;
+    int     j = 0;
+    int     k = 0;
+    char    *delimiter;
+    int     l = 0;
 
-    i = 0;
-    j = 0;
-    k = 0;
-    while (input[i] && input[i] == '<' && input[i] == ' ')
-    {
-        k++;
+    while (input[i] && (input[i] == '<' || input[i] == ' '))
         i++;
-    }
-    while (input[i] != ' ')
-    {
+    k = i;
+    while (input[i] != ' ' && input[i] != '\0' && input[i] != '\n')
         i++;
-        j++;
-    }
-    l = i;
-    Delimiter = malloc(j + 1);
-    if (!Delimiter)
-    {
+    j = i - k;
+    delimiter = malloc(j + 1);
+    if (!delimiter)
+	{
         perror("Error\n");
         exit(1);
     }
-    i = 0;
-    while (i < j)
-    {
-        Delimiter[i] = input[k];
-        k++;
-        i++;
-    }
-    Delimiter[i] = '\0';
-    if (!ft_strchr(input + k, Delimiter, &l))
-    {
-        printf("Undefined Delimiteur in here-doc");
+	l = i;
+    strncpy(delimiter, input + j, k);
+    delimiter[j] = '\0';
+    if (!find_delimiter_in_lines(input, delimiter, &l))
+	{
+        printf("Undefined Delimiter in here-doc\n");
+        free(delimiter);
         exit(1);
     }
-    return (heredoc_token(input, l));
-    
+    free(delimiter);
+    return heredoc_token(input, l);
 }
 
 Token **tokenize(char *input) {
@@ -286,13 +324,13 @@ Token **tokenize(char *input) {
     char *word;
 
     tokens = (Token **)malloc(sizeof(Token *));
-    if (!tokens) {
-        fprintf(stderr, "Error: Memory allocation failed\n");
+    if (!tokens)
+	{
+        printf("Error: Memory allocation failed\n");
         exit(EXIT_FAILURE);
     }
     *tokens = NULL;
     len = strlen(input);
-
     while (input[i])
     {
         if (input[i] == ' ' || input[i] == '\t') {
@@ -342,12 +380,6 @@ Token **tokenize(char *input) {
             while (input[i] && !ft_is_separator(input[i]) && input[i] != ' ' && input[i] != '&')
                 i++;
             word = strndup(input + start, i - start);
-            // printf("word")
-            // if(get_token_type(word) == 22)
-            // {
-            //     printf("check\n");
-            //     check_heredoc(input + i);
-            // }
             add_token(tokens, get_token_type(word), word);
             free(word);
         }

@@ -74,6 +74,14 @@ typedef struct token
 	struct token	*next;
 }					Token;
 
+typedef struct command
+{
+	char	*command;
+	char	**arguments;
+	int		infile;
+	int		outfile;
+}t_command;
+
 typedef struct stack
 {
 	Token			*token;
