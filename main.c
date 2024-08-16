@@ -3,6 +3,7 @@
 int	main(void)
 {
 	char	*input;
+	// Token	*parser;
 	Token	**tokens;
 
 	tokens = NULL;
@@ -15,6 +16,7 @@ int	main(void)
 			printf("token_value  = %s token_type = %d\n", (*tokens)->value, (*tokens)->type);
 			(*tokens) = (*tokens)->next;
 		}
+		ft_parser(*tokens);
 	}
 
 	// t_stack *operator_stack = NULL;

@@ -78,9 +78,10 @@ typedef struct command
 {
 	char	*command;
 	char	**arguments;
-	int		infile;
-	int		outfile;
-}t_command;
+	int		stdin_file;
+	int		stdout_file;
+	char	*operator;
+}t_parser;
 
 typedef struct stack
 {
@@ -108,6 +109,9 @@ char	*ft_substr(char *s, unsigned int start, size_t len);
 
 		    //pipex_utils
 char	*get_executable(char *command);
+
+			//parser
+void	ft_parser(Token *tokens);
 
 
 
