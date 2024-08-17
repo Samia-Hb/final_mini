@@ -3,7 +3,7 @@ CC = cc
 LFLAGS=-lreadline
 NAME = minishell
 
-SRCS = main.c tokenization.c pipex_utils.c parser.c libft/ft_split.c libft/ft_strjoin.c libft/ft_strtrim.c
+SRCS = main.c ast.c tokenization.c pipex_utils.c parser.c libft/ft_split.c libft/ft_strjoin.c libft/ft_strtrim.c
 OBJS = $(SRCS:.c=.o)
 
 all: $(NAME)

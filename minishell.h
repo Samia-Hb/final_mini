@@ -57,9 +57,13 @@ typedef struct ASTNode
 {
 	TokenType		type;
 	char			*value;
+	int				fd_in;
+	int				fd_out;
+	int				arg_nbr;
 	struct ASTNode	*left;
 	struct ASTNode	*right;
 }					ASTNode;
+
 
 typedef struct s_ast
 {
@@ -67,11 +71,13 @@ typedef struct s_ast
 	struct s_ast	*next;
 }					t_ast;
 
+
 typedef struct token
 {
 	TokenType		type;
 	char			*value;
 	struct token	*next;
+	struct token	*previous;
 }					Token;
 
 typedef struct command
@@ -113,6 +119,7 @@ char	*get_executable(char *command);
 			//parser
 void	ft_parser(Token *tokens);
 
-
+			//abstract syntax tree
+t_ast *generate_Ast(Token *tokens);
 
 #endif

@@ -1,9 +1,87 @@
 #include "minishell.h"
 
+void print_ast(t_ast *node)
+{
+	if (node == NULL)
+		return;
+	printf ("data = %s type = %d\n", node->node->value, node->node->type);
+    print_ast(node->node->left);
+    print_ast(node->node->right);
+}
+/////
+
+// queue => FIFO
+// stack => LIFO
+
+typedef struct queue
+{
+	Token *node;
+	struct queue *next;
+}t_queue;
+
+typedef struct stack
+{
+	Token *node;
+	struct stack *next;
+}t_stack;
+
+t_stack *push_queue(t_stack *stack, Token *node)
+{
+	t_stack *head;
+
+	head = malloc(sizeof(t_stack));
+	if (!head)
+		return (NULL);
+	head->node = node;
+	if (!stack)
+		return (head);
+	head->next = stack;
+	stack = head;
+	return (stack);
+}
+
+t_queue *push_queue(t_queue *queue, Token *node)
+{
+    t_queue *new_node;
+    t_queue *temp;
+
+    new_node = malloc(sizeof(t_queue));
+    if (!new_node)
+        return (NULL);
+    new_node->node = node;
+    new_node->next = NULL;
+    if (!queue)
+        return new_node;
+    temp = queue;
+    while (temp->next)
+        temp = temp->next;
+    temp->next = new_node;
+    return queue;
+}
+
+
+t_ast *generate_Ast(Token *tokens)
+{
+	t_queue *output_queue;
+	t_stack *operator_stack;
+
+	if (tokens->type == TOKEN_COMMAND || tokens->type == TOKEN_UNKNOWN
+	|| tokens->type == TOKEN_OPTION || tokens->type == TOKEN_ARGUMENT)
+    	output_queue = push_queue(output_queue, tokens);
+    else if (tokens->type == TOKEN_OPEN_PARENTH)
+    	operator_stack = push_stack(operator_stack, tokens);
+    else if (tokens->type == TOKEN_CLOSE_PARENTH)
+	{
+	
+	}
+}
+
+
+////
 int	main(void)
 {
 	char	*input;
-	// Token	*parser;
+	Token	*tmp;
 	Token	**tokens;
 
 	tokens = NULL;
@@ -11,71 +89,15 @@ int	main(void)
 	{
 		input = readline("Minishell$ ");
 		tokens = tokenize(input);
-		while(*tokens)
+		tmp = *tokens;
+		while(tmp)
 		{
-			printf("token_value  = %s token_type = %d\n", (*tokens)->value, (*tokens)->type);
-			(*tokens) = (*tokens)->next;
+			printf("token_value  = %s token_type = %d\n", tmp->value, tmp->type);
+			tmp = tmp->next;
 		}
-		ft_parser(*tokens);
+		ft_parser (*tokens);
 	}
-
-	// t_stack *operator_stack = NULL;
-	// t_queue *output_queue = NULL;
-	// while (current_token)
-	// {
-	//     if (current_token->type == COMMAND || current_token->type == ARGUMENT
-		// || current_token->type == OPTION || current_token->type == NUMBER) {
-	//         output_queue = push_queue(output_queue, current_token);
-	//     } else if (current_token->type == OPEN_PARENTHESIS) {
-	//         operator_stack = push_stack(operator_stack, current_token);
-	//     } else if (current_token->type == CLOSE_PARENTHESIS) {
-	//         while (peek_stack(operator_stack)
-		// && peek_stack(operator_stack)->type != OPEN_PARENTHESIS) {
-	//             output_queue = push_queue(output_queue,
-			// pop_stack(&operator_stack));
-	//         }
-	//         pop_stack(&operator_stack);
-	//     } else if (is_operator(current_token)) {
-	//         while (peek_stack(operator_stack)
-		// && is_operator(peek_stack(operator_stack)) &&
-	//                get_precedence(peek_stack(operator_stack)) >= get_precedence(current_token)) {
-	//             output_queue = push_queue(output_queue,
-			// pop_stack(&operator_stack));
-	//         }
-	//         operator_stack = push_stack(operator_stack, current_token);
-	//     }
-	//     current_token = current_token->next;
-	// }
-	// while (peek_stack(operator_stack))
-	// {
-	//     output_queue = push_queue(output_queue, pop_stack(&operator_stack));
-	// }
-	// t_queue *queue;
-	// queue = output_queue;
-	// t_ast *ast_stack = NULL;
-	// ASTNode *node;
-	// while (queue)
-	// {
-	//     if (is_operator(queue->token))
-	// 	{
-	//         ASTNode *right;
-	//         ASTNode *left;
-	//         right = pop_ast(&ast_stack);
-	//         left = pop_ast(&ast_stack);
-	//         node = create_ast_node(queue->token->type, queue->token->value,
-			// left, right);
-	//         push_ast_stack(&ast_stack, node);
-	//     } else
-	// 	{
-	//         node = create_ast_node(queue->token->type, queue->token->value,
-			// NULL, NULL);
-	//         push_ast_stack(&ast_stack, node);
-	//     }
-	//     queue = queue->next;
-	// }
-	// node = pop_ast(&ast_stack);
-	// printTree(node, 0);
-	// free_tokens(*tokens);
-	// free(input);
+	t_ast	*ast = generate_Ast(tokens);
+	print_ast(ast);
 	return (0);
 }

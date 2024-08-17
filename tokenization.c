@@ -29,9 +29,8 @@ void add_token(Token **tokens, TokenType type, const char *value)
 	{
         ptr = *tokens;
         while (ptr->next)
-		{
             ptr = ptr->next;
-        }
+        new_node->previous = ptr;
         ptr->next = new_node;
     }
 }
@@ -94,6 +93,13 @@ char *handle_Parentheses(char *str, char c)
     return word;
 }
 
+int isseperator(char c)
+{
+    if (c == ' ' || c == '\t' || c == '\n' || c == '|' || c == '<' || c == '>' || c == '?' || c == '$' || c == ';' || c == '&' || c == '*')
+        return (0);
+    return (1);
+}
+
 char *handle_quote(char *str, char c)
 {
 	int i = 1;
@@ -110,21 +116,30 @@ char *handle_quote(char *str, char c)
     }
     if (str[i] != c)
 	{
-        fprintf(stderr, "Error: unclosed quote\n");
-        exit(EXIT_FAILURE);
+        printf("Error: unclosed quote\n");
+        exit(130);
     }
-    word = malloc(j + 3);
+    while (isseperator(str[i]))
+    {
+        i++;
+        j++;
+    }
+    word = malloc(j + 2);
     if (!word)
 	{
         fprintf(stderr, "Error: memory allocation failed\n");
         exit(EXIT_FAILURE);
     }
-    word[0] = c;
-    strncpy(word + 1, str + 1, j);
-    word[j + 1] = c;
-    word[j + 2] = '\0';
+    i = 0;
+    while (i <= j)
+    {
+        word[i] = str[i];
+        i++;
+    }
+    word[i] = '\0';
     return word;
 }
+
 
 int get_token_type(const char *token)
 {
