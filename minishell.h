@@ -8,15 +8,30 @@
 #include <string.h>
 #include <unistd.h>
 
-#define PREC_PIPE 0
-#define PREC_LOGICAL_AND 8
-#define PREC_LOGICAL_OR 7
-#define PREC_SEQUENTIAL_EXECUTION 2
-#define PREC_ADDITIVE 15
-#define PREC_MULTIPLICATIVE 16
-
-char				*ft_strjoin(char const *s1, char const *s2);
-char				*get_executable(char *command);
+#define PREC_WHITESPACES          25  
+#define PREC_BACKTICK             24
+#define PREC_DOLLAR               23
+#define PREC_TILDLE               22 
+#define PREC_PARENTHESES          21 
+#define PREC_LOGICAL_NOT          20 
+#define PREC_ASTERISK             19 
+#define PREC_SLASH                18
+#define PREC_BACKSLASH            17 
+#define PREC_QUESTION             16
+#define PREC_DOT                  15
+#define PREC_ADDITIVE             14
+#define PREC_ASSIGNMENT           13
+#define PREC_AMPERSAND            12
+#define PREC_LOGICAL_AND          11 
+#define PREC_PIPE                 10 
+#define PREC_LOGICAL_OR           9
+#define PREC_REDIR_IN             8 
+#define PREC_REDIR_OUT            7 
+#define PREC_REDIR_APPEND         6
+#define PREC_REDIR_HERE_DOC       5
+#define PREC_SEMICOLON            4
+#define PREC_COLON                3 
+#define PREC_NEW_LINE             2 
 
 
 typedef enum
@@ -53,25 +68,6 @@ typedef enum
 	TOKEN_UNKNOWN
 }					TokenType;
 
-typedef struct ASTNode
-{
-	TokenType		type;
-	char			*value;
-	int				fd_in;
-	int				fd_out;
-	int				arg_nbr;
-	struct ASTNode	*left;
-	struct ASTNode	*right;
-}					ASTNode;
-
-
-typedef struct s_ast
-{
-	ASTNode			*node;
-	struct s_ast	*next;
-}					t_ast;
-
-
 typedef struct token
 {
 	TokenType		type;
@@ -79,6 +75,7 @@ typedef struct token
 	struct token	*next;
 	struct token	*previous;
 }					Token;
+
 
 typedef struct command
 {
@@ -89,23 +86,41 @@ typedef struct command
 	char	*operator;
 }t_parser;
 
-typedef struct stack
+typedef struct ASTNode
 {
-	Token			*token;
-	struct stack	*next;
-}					t_stack;
+	Token *token;
+	int				fd_in;
+	int				fd_out;
+	int				arg_nbr;
+	struct ASTNode	*left;
+	struct ASTNode	*right;
+}					ASTNode;
+
+typedef struct s_ast
+{
+	ASTNode			*node; 
+	struct s_ast	*left;
+	struct s_ast	*right;
+	struct s_ast	*next;
+}					t_ast;
 
 typedef struct queue
 {
-	Token			*token;
+	Token			*node;
 	struct queue	*next;
 }					t_queue;
 
+typedef struct stack
+{
+	Token			*node;   // Changed to t_ast pointer
+	struct stack	*next;
+}					t_stack;
+
 			//**Tokenization**/
 Token	**tokenize(char *input);
-void add_token(Token **tokens, TokenType type, const char *value);
+void	add_token(Token **tokens, TokenType type, const char *value);
 char	*handle_quote(char *str, char c);
-void print_token(Token *tokens);
+void	print_token(Token *tokens);
 
 			//**libft**/
 char	**ft_split(char *s, char c);
@@ -120,6 +135,5 @@ char	*get_executable(char *command);
 void	ft_parser(Token *tokens);
 
 			//abstract syntax tree
-t_ast *generate_Ast(Token *tokens);
-
+t_ast	*generate_ast_from_postfix(Token *tokens);
 #endif

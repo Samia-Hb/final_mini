@@ -143,6 +143,8 @@ char *handle_quote(char *str, char c)
 
 int get_token_type(const char *token)
 {
+    if (get_executable((char *)token))
+        return TOKEN_COMMAND;
     if (!strcmp(token, "?"))
         return TOKEN_QUESTION;
     if (!strcmp(token, "~"))
@@ -348,7 +350,11 @@ Token **tokenize(char *input) {
     len = strlen(input);
     while (input[i])
     {
-        if (input[i] == ' ' || input[i] == '\t') {
+        if (input[i] == ' ' || input[i] == '\t')
+            i++;
+        else if (input[i] == '$')
+        {
+            add_token(tokens, TOKEN_DOLLAR, "?");
             i++;
         }
         else if (input[i] == '<' && input[i + 1] && input[i+1] == '<')
@@ -370,17 +376,18 @@ Token **tokenize(char *input) {
             add_token(tokens, TOKEN_ARGUMENT, word);
             i += strlen(word);
             free(word);
-        }else if (strchr("~?&.`$><(){}[]|;", input[i])) {
-            char *op = char_to_string(input[i], 0);
-            add_token(tokens, get_token_type(op), op);
-            free(op);
-            i++;
-        } else if ((input[i] == '&' && i + 1 < len && input[i + 1] == '&') ||
+        }else if ((input[i] == '&' && i + 1 < len && input[i + 1] == '&') ||
                    (input[i] == '|' && i + 1 < len && input[i + 1] == '|')) {
             char *op = char_to_string(input[i], input[i + 1]);
             add_token(tokens, get_token_type(op), op);
             free(op);
             i += 2;
+        }
+        else if (strchr("~?&.`$><(){}[]|;", input[i])) {
+            char *op = char_to_string(input[i], 0);
+            add_token(tokens, get_token_type(op), op);
+            free(op);
+            i++;
         }
         else if (input[i] == '-') {
             start = i;
