@@ -76,7 +76,6 @@ typedef struct token
 	struct token	*previous;
 }					Token;
 
-
 typedef struct command
 {
 	char	*command;

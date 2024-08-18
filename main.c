@@ -127,24 +127,63 @@ t_stack *pop_stack(t_stack **stack)
 
 t_ast *create_ast_node(Token *token)
 {
+    // Allocate memory for the t_ast structure
     t_ast *new_node = malloc(sizeof(t_ast));
     if (!new_node)
-        return (NULL);
+        return NULL;
+
+    // Allocate memory for the ASTNode structure
     new_node->node = malloc(sizeof(ASTNode));
     if (!new_node->node)
     {
         free(new_node);
-        return (NULL);
+        return NULL;
     }
+
+    // Allocate memory for the Token structure
+    new_node->node->token = malloc(sizeof(Token)); // <-- This is the missing allocation
+    if (!new_node->node->token)
+    {
+        free(new_node->node);
+        free(new_node);
+        return NULL;
+    }
+
+    // Duplicate the token's value and assign the type
+    new_node->node->token->value = strdup(token->value);
     new_node->node->token->type = token->type;
-    new_node->node->token->value = token->value;
+
+    // Initialize the rest of the ASTNode and t_ast pointers
     new_node->node->left = NULL;
     new_node->node->right = NULL;
     new_node->left = NULL;
     new_node->right = NULL;
     new_node->next = NULL;
+
     return new_node;
 }
+
+
+// t_ast *create_ast_node(Token *token)
+// {
+//     t_ast *new_node = malloc(sizeof(t_ast));
+//     if (!new_node)
+//         return (NULL);
+//     new_node->node = malloc(sizeof(ASTNode));
+//     if (!new_node->node)
+//     {
+//         free (new_node);
+//         return (NULL);
+//     }
+//     new_node->node->token->value = strdup(token->value);
+//     new_node->node->token->type = token->type;
+//     new_node->node->left = NULL;
+//     new_node->node->right = NULL;
+//     new_node->left = NULL;
+//     new_node->right = NULL;
+//     new_node->next = NULL;
+//     return (new_node);
+// }
 
 t_ast *push_to_ast_stack(t_ast *ast_stack, t_ast *ast_node)
 {
@@ -159,42 +198,6 @@ t_ast *pop_ast_stack(t_ast **ast_stack)
         *ast_stack = head->next;
     return head;
 }
-
-// t_ast *generate_ast_from_postfix(Token *tokens)
-// {
-//     t_ast *ast_stack = NULL;
-//     t_queue *postfix_queue = generate_postfix(tokens);
-//     while (postfix_queue)
-//     {
-//         printf("check\n");
-//         if (is_operand(postfix_queue->node))
-//         {
-//             t_ast *new_node = create_ast_node(postfix_queue->node);
-//             ast_stack = push_to_ast_stack(ast_stack, new_node);
-//         }
-//         else if (is_operator(postfix_queue->node))
-//         {
-//             t_ast *right = pop_ast_stack(&ast_stack);
-//             t_ast *left = pop_ast_stack(&ast_stack);
-//             t_ast *new_node = create_ast_node(postfix_queue->node);
-//             new_node->node->left = left->node;
-//             new_node->node->right = right->node;
-//             ast_stack = push_to_ast_stack(ast_stack, new_node);
-//         }
-//         postfix_queue = postfix_queue->next;
-//     }
-//     return pop_ast_stack(&ast_stack);
-// }
-
-
-// void print_tokens(Token *tokens)
-// {
-//     while (tokens)
-//     {
-//         printf("data = %s type = %d\n", (tokens)->value, (tokens)->type);
-//         (tokens) = (tokens)->next;
-//     }
-// }
 
 int check_precedence(t_stack *stack, int token_type)
 {
@@ -223,9 +226,7 @@ t_queue *generate_postfix(Token *tokens)
         else
         {
             if (!holding_stack)
-            {
                 holding_stack = push_stack(holding_stack, tokens);
-            }
             else
             {
                 while (holding_stack && !check_precedence(holding_stack, tokens->type))
@@ -246,6 +247,47 @@ t_queue *generate_postfix(Token *tokens)
     }
     return (output_queue);
 }
+// cat file.txt | sort | uniq > output.txt
+
+t_ast *generate_ast_from_postfix(Token *tokens)
+{
+    t_ast	*ast_stack;
+    t_queue	*postfix_queue;
+	
+    ast_stack = NULL;
+	postfix_queue = generate_postfix(tokens);
+    while (postfix_queue)
+    {
+        if (is_operand(postfix_queue->node))
+        {
+            t_ast *new_node = create_ast_node(postfix_queue->node);
+            ast_stack = push_to_ast_stack(ast_stack, new_node);
+		}
+        else if (is_operator(postfix_queue->node))
+        {
+            t_ast *right = pop_ast_stack(&ast_stack);
+            t_ast *left = pop_ast_stack(&ast_stack);
+            t_ast *new_node = create_ast_node(postfix_queue->node);
+            new_node->node->left = left->node;
+            new_node->node->right = right->node;
+            ast_stack = push_to_ast_stack(ast_stack, new_node);
+        }
+        postfix_queue = postfix_queue->next;
+    }
+    return pop_ast_stack(&ast_stack);
+}
+
+
+void print_tokens(Token *tokens)
+{
+    while (tokens)
+    {
+        printf("data = %s type = %d\n", (tokens)->value, (tokens)->type);
+        (tokens) = (tokens)->next;
+    }
+}
+
+
 
 int	main(void)
 {
@@ -259,14 +301,15 @@ int	main(void)
 		input = readline("Minishell$ ");
 		tokens = tokenize(input);
         postfix_queue = generate_postfix(*tokens);
-        while(postfix_queue)
-        {
-            printf("data = %s type = %d\n", postfix_queue->node->value, postfix_queue->node->type);
-            postfix_queue = postfix_queue->next;
-        }
         // print_tokens(*tokens);
-		// t_ast *ast = generate_ast_from_postfix(*tokens);
-		// print_ast(ast);
+		t_ast *ast = generate_ast_from_postfix(*tokens);
+		print_ast(ast);
 	}
 	return (0);
 }
+
+		// while(postfix_queue)
+		// {
+		//     printf("data = %s type = %d\n", postfix_queue->node->value, postfix_queue->node->type);
+		//     postfix_queue = postfix_queue->next;
+		// }
