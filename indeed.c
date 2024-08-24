@@ -268,3 +268,88 @@
 //     }
 //     return (output_queue);
 // }
+
+//////////////
+
+// void tok_push(t_stack **head, t_stack **output_postfix, t_stack **holding_stack)
+// {
+// 	if (!holding_stack)
+// 		push_top_stack(head, holding_stack);
+// 	else 
+// 	{
+// 		while ((*holding_stack) && 
+// 			((get_precedence((*holding_stack)->node->type) > get_precedence((*head)->node->type)) ||
+// 				(get_precedence((*holding_stack)->node->type) == get_precedence((*head)->node->type) &&
+// 				(*holding_stack)->node->type == TOKEN_PIPE)))
+//     	{
+//         	push_back_stack(holding_stack, output_postfix);
+//     	}
+//     	push_top_stack(head, holding_stack);
+// 	}
+// }
+
+//////////////
+#include "main.c"
+
+t_queue *generate_postfix(Token *tokens)
+{
+    t_queue *output_queue ;
+    t_stack *holding_stack ;
+    t_stack *tmp ;
+    int i = 0;
+
+    output_queue = NULL;
+    holding_stack = NULL;
+    tmp = NULL;
+    while (tokens)
+    {
+        if (tokens->type == TOKEN_COMMAND || tokens->type == TOKEN_UNKNOWN ||
+            tokens->type == TOKEN_OPTION || tokens->type == TOKEN_ARGUMENT)
+            output_queue = push_queue(output_queue, tokens);
+        else
+        {
+            if (!holding_stack)
+                holding_stack = push_stack(holding_stack, tokens);
+            else
+            {
+                while (holding_stack && !check_precedence(holding_stack, tokens->type))
+                {
+                    tmp = pop_stack(&holding_stack);
+                    output_queue = push_queue(output_queue, tmp->node);
+                    holding_stack = holding_stack->next;
+                }
+                holding_stack = push_stack(holding_stack, tokens);
+            }
+        }
+        tokens = tokens->next;
+    }
+    while (holding_stack)
+    {
+        output_queue = push_queue(output_queue, holding_stack->node);
+        holding_stack = holding_stack->next;
+    }
+    return (output_queue);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

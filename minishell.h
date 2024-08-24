@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
 #include <unistd.h>
 
 #define PREC_WHITESPACES          25  
@@ -23,15 +24,15 @@
 #define PREC_ASSIGNMENT           13
 #define PREC_AMPERSAND            12
 #define PREC_LOGICAL_AND          11 
-#define PREC_PIPE                 10 
-#define PREC_LOGICAL_OR           9
-#define PREC_REDIR_IN             8 
-#define PREC_REDIR_OUT            7 
-#define PREC_REDIR_APPEND         6
-#define PREC_REDIR_HERE_DOC       5
+#define PREC_PIPE                 9  // LOWER than redirection
+#define PREC_LOGICAL_OR           8
+#define PREC_REDIR_IN             10  // HIGHER than pipe
+#define PREC_REDIR_OUT            10  // HIGHER than pipe
+#define PREC_REDIR_APPEND         10  // HIGHER than pipe
+#define PREC_REDIR_HERE_DOC       10  // HIGHER than pipe
 #define PREC_SEMICOLON            4
 #define PREC_COLON                3 
-#define PREC_NEW_LINE             2 
+#define PREC_NEW_LINE             2
 
 
 typedef enum
@@ -133,6 +134,24 @@ char	*get_executable(char *command);
 			//parser
 void	ft_parser(Token *tokens);
 
+			//generate_postfix
+t_stack *generate_postfix(Token *tokens);
+int		get_precedence(int token_type);
+void	transfer_tokens_to_stack(Token *token_list, t_stack **stack);
+int		check_precedence(t_stack *stack, int token_type);
+void	push_back_stack(t_stack **src, t_stack **dest);
+
 			//abstract syntax tree
 t_ast	*generate_ast_from_postfix(Token *tokens);
+t_stack *pop_stack(t_stack **stack);
+t_ast *pop_ast_stack(t_ast **ast_stack);
+int		is_operator(Token *node);
+int		is_operand(Token *node);
+t_ast	*push_to_ast_stack(t_ast *ast_stack, t_ast *ast_node);
+
+			//mini_utils
+void	print_stack(t_stack *head);
+t_stack *new_stack_node(Token *token);
+void push_top_stack(t_stack **src, t_stack **dest);
+
 #endif
