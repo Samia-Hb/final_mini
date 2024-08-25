@@ -135,7 +135,7 @@ char	*get_executable(char *command);
 void	ft_parser(Token *tokens);
 
 			//generate_postfix
-t_stack *generate_postfix(Token *tokens);
+t_queue *generate_postfix(Token *tokens);
 int		get_precedence(int token_type);
 void	transfer_tokens_to_stack(Token *token_list, t_stack **stack);
 int		check_precedence(t_stack *stack, int token_type);

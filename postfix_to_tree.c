@@ -45,7 +45,6 @@ t_ast *generate_ast_from_postfix(Token *tokens)
     postfix_output = generate_postfix(tokens);
     while (postfix_output)
     {
-        printf("data = %s\n", postfix_output->node->value);
         if (is_operand(postfix_output->node))
         {
             ast_node = create_ast_node(postfix_output->node);
@@ -62,6 +61,5 @@ t_ast *generate_ast_from_postfix(Token *tokens)
         }
         postfix_output = postfix_output->next;
     }
-    printf("=====================>\n");
     return ast_stack;
 }
