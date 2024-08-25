@@ -32,7 +32,7 @@ t_ast *create_ast_node(Token *token)
 
 t_ast *generate_ast_from_postfix(Token *tokens)
 {
-    t_stack *postfix_output;
+    t_queue *postfix_output;
     t_ast   *ast_stack;
     t_ast   *ast_node;
     t_ast   *left_node;
