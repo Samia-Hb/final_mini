@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include <signal.h>
 #include <unistd.h>
 
@@ -73,6 +74,8 @@ typedef struct token
 {
 	TokenType		type;
 	char			*value;
+	bool			double_quoted;
+	bool			sigle_quoted;
 	struct token	*next;
 	struct token	*previous;
 }					Token;
@@ -142,7 +145,7 @@ int		check_precedence(t_stack *stack, int token_type);
 void	push_back_stack(t_stack **src, t_stack **dest);
 
 			//abstract syntax tree
-t_ast	*generate_ast_from_postfix(Token *tokens);
+t_ast	*generate_ast_from_postfix(t_queue *postfix_output);
 t_stack *pop_stack(t_stack **stack);
 t_ast *pop_ast_stack(t_ast **ast_stack);
 int		is_operator(Token *node);
@@ -153,5 +156,6 @@ t_ast	*push_to_ast_stack(t_ast *ast_stack, t_ast *ast_node);
 void	print_stack(t_stack *head);
 t_stack *new_stack_node(Token *token);
 void push_top_stack(t_stack **src, t_stack **dest);
+int check_syntax_errors(Token *tokens);
 
 #endif

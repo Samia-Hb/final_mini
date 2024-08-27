@@ -30,9 +30,8 @@ t_ast *create_ast_node(Token *token)
     return (new_node);
 }
 
-t_ast *generate_ast_from_postfix(Token *tokens)
+t_ast *generate_ast_from_postfix(t_queue *postfix_output)
 {
-    t_queue *postfix_output;
     t_ast   *ast_stack;
     t_ast   *ast_node;
     t_ast   *left_node;
@@ -42,7 +41,6 @@ t_ast *generate_ast_from_postfix(Token *tokens)
     ast_node = NULL;
     left_node = NULL;
     right_node = NULL;
-    postfix_output = generate_postfix(tokens);
     while (postfix_output)
     {
         if (is_operand(postfix_output->node))

@@ -1,146 +1,146 @@
 #include "minishell.h"
 
-void push_back_stack(t_stack **src, t_stack **dest)
-{
-	t_stack *node;
-	t_stack *tmp;
+// void push_back_stack(t_stack **src, t_stack **dest)
+// {
+// 	t_stack *node;
+// 	t_stack *tmp;
 
-    if (!src || !*src)
-        return;
-    node = pop_stack(src);
-    if (!node)
-        return;
-    if (*dest == NULL)
-        *dest = node;
-    else
-    {
-        tmp = *dest;
-        while (tmp->next)
-            tmp = tmp->next;
-        tmp->next = node;
-    }
-}
+//     if (!src || !*src)
+//         return;
+//     node = pop_stack(src);
+//     if (!node)
+//         return;
+//     if (*dest == NULL)
+//         *dest = node;
+//     else
+//     {
+//         tmp = *dest;
+//         while (tmp->next)
+//             tmp = tmp->next;
+//         tmp->next = node;
+//     }
+// }
 
-t_stack *create_node(Token *token)
-{
-    t_stack *node;
+// t_stack *create_node(Token *token)
+// {
+//     t_stack *node;
 
-    node = malloc(sizeof(t_stack));
-    if(!node)
-        return (NULL);
-    node->node = token;
-    node->next = NULL;
-    return (node);
-}
-void enqueue(t_queue **queue, Token *token)
-{
-    t_queue *new_node;
-    t_queue *temp;
+//     node = malloc(sizeof(t_stack));
+//     if(!node)
+//         return (NULL);
+//     node->node = token;
+//     node->next = NULL;
+//     return (node);
+// }
+// void enqueue(t_queue **queue, Token *token)
+// {
+//     t_queue *new_node;
+//     t_queue *temp;
 
-    // Allocate memory for the new node
-    new_node = malloc(sizeof(t_queue));
-    new_node->node = token;
-    new_node->next = NULL;
+//     // Allocate memory for the new node
+//     new_node = malloc(sizeof(t_queue));
+//     new_node->node = token;
+//     new_node->next = NULL;
 
-    // If queue is empty, add the new node as the first element
-    if (*queue == NULL)
-    {
-        *queue = new_node;
-    }
-    else
-    {
-        // Traverse to the end of the queue and add the new node
-        temp = *queue;
-        while (temp->next != NULL)
-            temp = temp->next;
-        temp->next = new_node;
-    }
-}
+//     // If queue is empty, add the new node as the first element
+//     if (*queue == NULL)
+//     {
+//         *queue = new_node;
+//     }
+//     else
+//     {
+//         // Traverse to the end of the queue and add the new node
+//         temp = *queue;
+//         while (temp->next != NULL)
+//             temp = temp->next;
+//         temp->next = new_node;
+//     }
+// }
 
-void push_to_stack(t_stack **src, t_stack **dest)
-{
-	t_stack *head;
+// void push_to_stack(t_stack **src, t_stack **dest)
+// {
+// 	t_stack *head;
 
-	head = pop_stack(src);
-	head->next = *dest;
-    *dest = head;
-}
-int get_precedence(int type)
-{
-    if (type == TOKEN_OPEN_PARENTH || type == TOKEN_CLOSE_PARENTH)
-        return (4);
-    if (type == TOKEN_DOUBLE_AMP || type == TOKEN_DOUBLE_PIPE)
-        return (3);
-    if (type == TOKEN_PIPE)
-        return (2);  // Pipe should have lower precedence than redirection
-    if (type == TOKEN_REDIR_APPEND || type == TOKEN_REDIR_HERE_DOC 
-        || type == TOKEN_REDIR_OUT || type == TOKEN_REDIR_IN)
-        return (1);  // Redirection operators should have higher precedence
-    return (0);
-}
+// 	head = pop_stack(src);
+// 	head->next = *dest;
+//     *dest = head;
+// }
+// int get_precedence(int type)
+// {
+//     if (type == TOKEN_OPEN_PARENTH || type == TOKEN_CLOSE_PARENTH)
+//         return (4);
+//     if (type == TOKEN_DOUBLE_AMP || type == TOKEN_DOUBLE_PIPE)
+//         return (3);
+//     if (type == TOKEN_PIPE)
+//         return (2);  // Pipe should have lower precedence than redirection
+//     if (type == TOKEN_REDIR_APPEND || type == TOKEN_REDIR_HERE_DOC 
+//         || type == TOKEN_REDIR_OUT || type == TOKEN_REDIR_IN)
+//         return (1);  // Redirection operators should have higher precedence
+//     return (0);
+// }
 
-int check_precedence(t_stack *stack, int token_type)
-{
-	while (stack)
-	{
+// int check_precedence(t_stack *stack, int token_type)
+// {
+// 	while (stack)
+// 	{
 
-		if (get_precedence(stack->node->type) >= get_precedence(token_type))
-			return (0);
-		stack = stack->next;
-	}
-	return (1);
-}
+// 		if (get_precedence(stack->node->type) >= get_precedence(token_type))
+// 			return (0);
+// 		stack = stack->next;
+// 	}
+// 	return (1);
+// }
 
-t_queue *generate_postfix(Token *tokens)
-{
-    t_stack *head;
-    t_queue *output_queue;
-    t_stack *operator_stack;
-    t_stack *popped;
+// t_queue *generate_postfix(Token *tokens)
+// {
+//     t_stack *head;
+//     t_queue *output_queue;
+//     t_stack *operator_stack;
+//     t_stack *popped;
 
-    head = NULL;
-    output_queue = NULL;
-    operator_stack = NULL;
-    transfer_tokens_to_stack(tokens, &head);
-    while (head)
-    {
-        if (is_operand(head->node))
-        {
-            enqueue(&output_queue, head->node);
-            head = head->next;
-        }
-        else
-        {
-            if (head->node->type == TOKEN_CLOSE_PARENTH)
-            {
-                while (operator_stack && operator_stack->node->type != TOKEN_OPEN_PARENTH)
-                {
-                    popped = pop_stack(&operator_stack);
-                    enqueue(&output_queue, popped->node);
-                }
-                pop_stack(&operator_stack);
-                head = head->next;
-            }
-            else if (operator_stack)
-            {
-                while (!check_precedence(operator_stack, head->node->type))
-                {
-                    popped = pop_stack(&operator_stack);
-                    enqueue(&output_queue, popped->node);
-                }
-                push_to_stack(&head, &operator_stack);
-            }
-            else
-                push_to_stack(&head, &operator_stack);
-        }
-    }
-    while (operator_stack)
-    {
-        popped = pop_stack(&operator_stack);
-        enqueue(&output_queue, popped->node);
-    }
-    return output_queue;
-}
+//     head = NULL;
+//     output_queue = NULL;
+//     operator_stack = NULL;
+//     transfer_tokens_to_stack(tokens, &head);
+//     while (head)
+//     {
+//         if (is_operand(head->node))
+//         {
+//             enqueue(&output_queue, head->node);
+//             head = head->next;
+//         }
+//         else
+//         {
+//             if (head->node->type == TOKEN_CLOSE_PARENTH)
+//             {
+//                 while (operator_stack && operator_stack->node->type != TOKEN_OPEN_PARENTH)
+//                 {
+//                     popped = pop_stack(&operator_stack);
+//                     enqueue(&output_queue, popped->node);
+//                 }
+//                 pop_stack(&operator_stack);
+//                 head = head->next;
+//             }
+//             else if (operator_stack)
+//             {
+//                 while (!check_precedence(operator_stack, head->node->type))
+//                 {
+//                     popped = pop_stack(&operator_stack);
+//                     enqueue(&output_queue, popped->node);
+//                 }
+//                 push_to_stack(&head, &operator_stack);
+//             }
+//             else
+//                 push_to_stack(&head, &operator_stack);
+//         }
+//     }
+//     while (operator_stack)
+//     {
+//         popped = pop_stack(&operator_stack);
+//         enqueue(&output_queue, popped->node);
+//     }
+//     return output_queue;
+// }
 
 
 

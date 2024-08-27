@@ -131,6 +131,17 @@ void print_queue(t_queue *queue)
     }
 }
 
+// int check_precedence(t_stack *stack, int token_type)
+// {
+// 	while (stack)
+// 	{
+
+// 		if (get_precedence(stack->node->type) >= get_precedence(token_type))
+// 			return (0);
+// 		stack = stack->next;
+// 	}
+// 	return (1);
+// }
 
 void print_tokens(Token *tokens)
 {
@@ -141,26 +152,26 @@ void print_tokens(Token *tokens)
     }
 }
 
-
 int	main(void)
 {
 	char	*input;
 	Token	**tokens;
     t_queue *queue;
+    t_ast   *ast;
+    int     errno;
+
 	tokens = NULL;
 	while (1)
 	{
-		input = readline ("Minishell$ ");
-		tokens = tokenize (input);
+		input = readline("Minishell$ ");
+		tokens = tokenize(input);
+        errno = check_syntax_errors(*tokens);
+        // printf("check\n");
+        if(errno)
+            exit(errno);
         queue = generate_postfix(*tokens);
-        while (queue)
-        {
-            printf("%s ", queue->node->value);
-            queue = queue->next;
-        }
-        printf("\n");
-		// t_ast *ast = generate_ast_from_postfix(*tokens);
-		// print_ast(ast, 5);
+		ast = generate_ast_from_postfix(queue);
+		print_ast(ast, 5);
 	}
 	return (0);
 }
