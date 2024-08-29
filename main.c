@@ -161,14 +161,15 @@ int	main(void)
     int     errno;
 
 	tokens = NULL;
+    handle_signal();
 	while (1)
 	{
 		input = readline("Minishell$ ");
 		tokens = tokenize(input);
         errno = check_syntax_errors(*tokens);
-        // printf("check\n");
         if(errno)
             exit(errno);
+        // expand_(tokens);
         queue = generate_postfix(*tokens);
 		ast = generate_ast_from_postfix(queue);
 		print_ast(ast, 5);

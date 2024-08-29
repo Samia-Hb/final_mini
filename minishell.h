@@ -66,6 +66,8 @@ typedef enum
 	TOKEN_CLOSE_PARENTH,  // ") , ] , ]"
 	TOKEN_COMMAND,
 	TOKEN_OPTION,
+	TOKEN_DOUBLE_QUOTED,
+	TOKEN_SINGLE_QUOTED,
 	TOKEN_ARGUMENT, // String
 	TOKEN_UNKNOWN
 }					TokenType;
@@ -74,8 +76,7 @@ typedef struct token
 {
 	TokenType		type;
 	char			*value;
-	bool			double_quoted;
-	bool			sigle_quoted;
+	char			*expanded_value;
 	struct token	*next;
 	struct token	*previous;
 }					Token;
@@ -147,15 +148,23 @@ void	push_back_stack(t_stack **src, t_stack **dest);
 			//abstract syntax tree
 t_ast	*generate_ast_from_postfix(t_queue *postfix_output);
 t_stack *pop_stack(t_stack **stack);
-t_ast *pop_ast_stack(t_ast **ast_stack);
+t_ast	*pop_ast_stack(t_ast **ast_stack);
 int		is_operator(Token *node);
 int		is_operand(Token *node);
 t_ast	*push_to_ast_stack(t_ast *ast_stack, t_ast *ast_node);
 
 			//mini_utils
 void	print_stack(t_stack *head);
-t_stack *new_stack_node(Token *token);
-void push_top_stack(t_stack **src, t_stack **dest);
-int check_syntax_errors(Token *tokens);
+t_stack	*new_stack_node(Token *token);
+void	push_top_stack(t_stack **src, t_stack **dest);
+int		check_syntax_errors(Token *tokens);
+char	quote_type(const char *str);
+Token	*create_token(TokenType type, const char *value);
+char	*char_to_string(char c, char c2);
+int		get_token_type(const char *token, char c);
+void	print_tokens(Token *tokens);
+
+			//signals
+void handle_signal();
 
 #endif

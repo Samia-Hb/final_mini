@@ -1,5 +1,4 @@
-
-#include "minishell.h"
+# include "minishell.h"
 
 Token *create_token(TokenType type, const char *value)
 {
@@ -141,8 +140,14 @@ char *handle_quote(char *str, char c)
 }
 
 
-int get_token_type(const char *token)
+int get_token_type(const char *token, char c)
 {
+    if (c)
+    {
+        if (c == '"')
+            return TOKEN_DOUBLE_QUOTED;
+        return TOKEN_SINGLE_QUOTED;
+    }
     if (get_executable((char *)token))
         return TOKEN_COMMAND;
     if (!strcmp(token, "?"))
@@ -201,7 +206,7 @@ Token **ft_append_identifier(char *input, Token **token_list, int *tmp, int *j) 
     }
     value[k] = '\0';
     *j = i;
-    add_token(token_list, get_token_type(value), value);
+    add_token(token_list, get_token_type(value, 0), value);
     free (value);
     return token_list;
 }
@@ -352,6 +357,11 @@ Token **tokenize(char *input) {
     {
         if (input[i] == ' ' || input[i] == '\t')
             i++;
+        else if (input[i] == '&' && input[i+1] != '&')
+        {
+            add_token(tokens, TOKEN_AMPERSAND, "&");
+            i++;
+        }
         else if (input[i] == '$')
         {
             add_token(tokens, TOKEN_DOLLAR, "?");
@@ -373,43 +383,41 @@ Token **tokenize(char *input) {
         else if ((input[i] == '"' || input[i] == '\'') && (i == 0 || input[i - 1] != '\\'))
         {
             word = handle_quote(input + i, input[i]);
-            add_token(tokens, TOKEN_ARGUMENT, word);
+            add_token(tokens, get_token_type(word, input[i]), word);
             i += strlen(word);
             free(word);
         }else if ((input[i] == '&' && i + 1 < len && input[i + 1] == '&') ||
                    (input[i] == '|' && i + 1 < len && input[i + 1] == '|')) {
             char *op = char_to_string(input[i], input[i + 1]);
-            add_token(tokens, get_token_type(op), op);
+            add_token(tokens, get_token_type(op, 0), op);
             free(op);
             i += 2;
         }
         else if (strchr("~?&.`$><(){}[]|;", input[i])) {
             char *op = char_to_string(input[i], 0);
-            add_token(tokens, get_token_type(op), op);
+            add_token(tokens, get_token_type(op, 0), op);
             free(op);
             i++;
         }
-        else if (input[i] == '-') {
+        else if (input[i] == '-')
+        {
             start = i;
-            while (i < len && input[i] != ' ' && input[i] != '|' && !ft_is_separator(input[i])) {
+            while (i < len && input[i] != ' ' && input[i] != '|' && !ft_is_separator(input[i]))
+            {
                 i++;
             }
             word = strndup(input + start, i - start);
             add_token(tokens, TOKEN_OPTION, word);
             free(word);
-        } else {
+        } else
+        {
             start = i;
             while (input[i] && !ft_is_separator(input[i]) && input[i] != ' ' && input[i] != '&')
                 i++;
             word = strndup(input + start, i - start);
-            add_token(tokens, get_token_type(word), word);
+            add_token(tokens, get_token_type(word, 0), word);
             free(word);
         }
     }
     return tokens;
 }
-
-// printf("word = %s\n", word);
-// printf("strlen(word) = %lu\n", strlen(word));
-// printf("input[i] = '%c' \n", input[i]);
-// printf(" i_here = %d\n", i);

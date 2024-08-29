@@ -1,6 +1,7 @@
 #include "minishell.h"
 
-Token *create_token(char *type, char *value) {
+Token *create_token(char *type, char *value)
+{
     Token *token = (Token *)malloc(sizeof(Token));
     token->type = strdup(type);
     token->value = strdup(value);

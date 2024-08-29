@@ -72,30 +72,32 @@ int handle_parentheses(Token *token)
 
 int handle_consecutive_operator(Token *tokens)
 {
-	Token *current;
-	Token *prev;
+    Token *current;
+    Token *prev;
 
-	current = tokens->next;
-	prev = tokens;
-	while (current)
-	{
-		 if ((prev->type == TOKEN_PIPE || prev->type == TOKEN_DOUBLE_PIPE ||
-                 prev->type == TOKEN_DOUBLE_AMP || prev->type == TOKEN_REDIR_OUT ||
-                 prev->type == TOKEN_REDIR_IN || prev->type == TOKEN_REDIR_APPEND ||
-                 prev->type == TOKEN_REDIR_HERE_DOC) &&
-                (current->type == TOKEN_PIPE || current->type == TOKEN_DOUBLE_PIPE ||
-                 current->type == TOKEN_DOUBLE_AMP || current->type == TOKEN_REDIR_OUT ||
-                 current->type == TOKEN_REDIR_IN || current->type == TOKEN_REDIR_APPEND ||
-                 current->type == TOKEN_REDIR_HERE_DOC))
-            {
-                printf("Syntax Error: Consecutive operators detected.\n");
-                return 1;
-            }
-		prev = tokens;
-		tokens = tokens->next;
-	}
-	return (0);
+    current = tokens->next;
+    prev = tokens;
+    while (current)
+    {
+        if ((prev->type == TOKEN_PIPE || prev->type == TOKEN_DOUBLE_PIPE || prev->type == TOKEN_AMPERSAND || prev->type == TOKEN_DOUBLE_PIPE ||
+             prev->type == TOKEN_DOUBLE_AMP || prev->type == TOKEN_REDIR_OUT ||
+             prev->type == TOKEN_REDIR_IN || prev->type == TOKEN_REDIR_APPEND ||
+             prev->type == TOKEN_REDIR_HERE_DOC) &&
+            (current->type == TOKEN_PIPE || current->type == TOKEN_AMPERSAND || current->type == TOKEN_DOUBLE_PIPE ||
+             current->type == TOKEN_DOUBLE_AMP || current->type == TOKEN_REDIR_OUT ||
+             current->type == TOKEN_REDIR_IN || current->type == TOKEN_REDIR_APPEND ||
+             current->type == TOKEN_REDIR_HERE_DOC))
+        {
+            printf("Syntax Error.\n");
+            return 1;
+        }
+        prev = current;
+        current = current->next;
+    }
+
+    return 0;
 }
+
 
 int lst_size(Token *stack)
 {
@@ -115,7 +117,7 @@ int handle_operators_bg_en(Token *tokens)
 	Token *last_node;
 
 	last_node = get_last_token(tokens);
-	if ((is_operator(tokens) && lst_size(tokens) == 1) || is_operator(last_node) || tokens->type == TOKEN_PIPE || tokens->type == TOKEN_DOUBLE_AMP ||tokens->type == TOKEN_DOUBLE_PIPE)
+	if ((is_operator(tokens) && lst_size(tokens) == 1) || is_operator(last_node) || tokens->type == TOKEN_PIPE || tokens->type == TOKEN_DOUBLE_AMP ||tokens->type == TOKEN_DOUBLE_PIPE || tokens->type == TOKEN_SEMICOLON)
 	{
 		printf("Syntax Error.\n");
 		return (1);
@@ -123,7 +125,7 @@ int handle_operators_bg_en(Token *tokens)
 	return (0);
 }
 
-void ft_strncpy(char *dest, char *src, int n)
+char *ft_strncpy(char *dest, char *src, int n)
 {
 	int i;
 
@@ -139,24 +141,32 @@ void ft_strncpy(char *dest, char *src, int n)
 
 int check_token(char *str, char c)
 {
-	int		i;
-	int		j;
-	char	*copied;
+    int		i;
+    int		j;
+    char	*copied;
+	int		result;
 
 	i = 1;
 	j = 0;
-	while (str[i] && str[i] != c)
-	{
-		i++;
-		j++;
-	}
-	copied = malloc(j + 1);
-	ft_strncpy(copied,str,j + 1);
-	if (is_operator(copied))
-		return (1);
-	return (0);
+    while (str[i] && str[i] != c)
+    {
+        i++;
+        j++;
+    }
+    copied = malloc(j);
+    if (copied == NULL)
+        return 0;
+    ft_strncpy(copied, str + 1, j);
+    copied[j] = '\0';
+	if(get_token_type(copied, 0) == TOKEN_COMMAND || get_token_type(copied, 0) == TOKEN_ARGUMENT || get_token_type(copied, 0) == TOKEN_UNKNOWN || get_token_type(copied, 0) == TOKEN_OPTION)
+    	result = 0;
+	else
+		result = 1;
+    free(copied);
+    return result;
 }
-char quote_type(char *str)
+
+char quote_type(const char *str)
 {
 	char c;
 	int i;
@@ -170,20 +180,25 @@ char quote_type(char *str)
 }
 void update_tokens(Token **tokens)
 {
-	char quote;
+    Token	*current;
+    char	quote;
 
-	while (*tokens)
-	{
-		if ((*tokens)->double_qutoed || (*tokens)->single_quoted)
-		{
-			quote = quote_types(*tokens);
-			if (check_token(*tokens,quote))
-				ft_strtrim(tokens, quote);
-			
-		}
-		(*tokens) = (*tokens)->next;
-	}
+	current = *tokens;
+    while (current)
+    {
+        if (current->type == TOKEN_DOUBLE_QUOTED || current->type == TOKEN_SINGLE_QUOTED)
+        {
+            quote = quote_type(current->value);
+            if (check_token(current->value, quote))
+            {
+                current->value = ft_strtrim(current->value, char_to_string(quote, 0));
+			}
+        }
+        current = current->next;
+    }
 }
+
+
 
 int check_syntax_errors(Token *tokens)
 {
@@ -198,6 +213,6 @@ int check_syntax_errors(Token *tokens)
 		return (5);
 	if (handle_consecutive_operator(tokens))
 		return (4);
-	printf ("check\n");
+	printf("check\n");
     return (0);
 }
