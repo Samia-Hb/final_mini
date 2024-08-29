@@ -147,7 +147,7 @@ void print_tokens(Token *tokens)
 {
     while (tokens)
     {
-        printf("data = %s type = %d\n", (tokens)->value, (tokens)->type);
+        printf("data = %s expanded_value = %s type = %d\n", (tokens)->value, tokens->expanded_value, (tokens)->type);
         (tokens) = (tokens)->next;
     }
 }
@@ -166,10 +166,12 @@ int	main(void)
 	{
 		input = readline("Minishell$ ");
 		tokens = tokenize(input);
+        expand(*tokens);
+        print_tokens(*tokens);
+        exit(1);
         errno = check_syntax_errors(*tokens);
         if(errno)
             exit(errno);
-        // expand_(tokens);
         queue = generate_postfix(*tokens);
 		ast = generate_ast_from_postfix(queue);
 		print_ast(ast, 5);

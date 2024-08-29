@@ -124,7 +124,7 @@ typedef struct stack
 Token	**tokenize(char *input);
 void	add_token(Token **tokens, TokenType type, const char *value);
 char	*handle_quote(char *str, char c);
-void	print_token(Token *tokens);
+void	print_tokens(Token *tokens);
 
 			//**libft**/
 char	**ft_split(char *s, char c);
@@ -166,5 +166,8 @@ void	print_tokens(Token *tokens);
 
 			//signals
 void handle_signal();
+
+			//expand
+void expand(Token *tokens);
 
 #endif

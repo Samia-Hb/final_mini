@@ -172,8 +172,11 @@ char quote_type(const char *str)
 	int i;
 
 	i = 0;
+	c = 0;
 	while (str[i] && (str[i] == ' ' || str[i] == '\t'))
+	{
 		i++;
+	}
 	if (str[i] == '"' || str[i] == '\'')
 		c = str[i];
 	return (c);
