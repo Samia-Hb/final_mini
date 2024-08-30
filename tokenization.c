@@ -364,7 +364,7 @@ Token **tokenize(char *input) {
         }
         else if (input[i] == '$')
         {
-            add_token(tokens, TOKEN_DOLLAR, "?");
+            add_token(tokens, TOKEN_DOLLAR, "$");
             i++;
         }
         else if (input[i] == '<' && input[i + 1] && input[i+1] == '<')

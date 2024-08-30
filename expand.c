@@ -30,7 +30,7 @@ char *get_word_to_expand(char *str)
 
     i = 0;
     length = 0;
-    while (str[i] && str[i] != ' ' && str[i] != '\t')
+    while (str[i] && str[i] != ' ' && str[i] != '\t' && str[i] != '"' && str[i] != '\'')
     {
         i++;
         length++;
@@ -71,21 +71,30 @@ char *expand_single_quote(Token *token)
 	return (expanded);
 }
 
-void expand_quote(Token *token)
+void expand_double_quote(Token *token)
 {
-    int     i;
-	int		type;
-    char    *word;
-    char    *str;
+    int			i;
+	int			type;
+	char	*word;
 
     i = 0;
     while (token->value[i])
     {
         if (token->value[i] == '$')
         {
-            word = get_word_to_expand(token->value + i);
-			type = get_word_type(word);
+            word = get_word_to_expand(token->value + i + 1);
+			type = get_token_type(word, 0);
+            if (type == TOKEN_COMMAND)
+            {
+                printf("Permission denied.\n");
+                exit(1);
+            }
+            if (!getenv(word))
+                token->expanded_value = NULL;
+            else
+                token->expanded_value = getenv(word);
         }
+        i++;
     }
 }
 
