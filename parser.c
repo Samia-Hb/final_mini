@@ -74,7 +74,7 @@ int handle_parentheses(Token *token)
         open_parentheses--;
     if (open_parentheses < 0)
     {
-        printf("Syntax Error: Unmatched closing parenthesis.\n");
+        printf("Syntax Error.\n");
         return 1;
     }
 	return (0);
@@ -191,6 +191,7 @@ char quote_type(const char *str)
 		c = str[i];
 	return (c);
 }
+
 void update_tokens(Token **tokens)
 {
     Token	*current;
@@ -210,7 +211,8 @@ void update_tokens(Token **tokens)
         current = current->next;
     }
 }
-int ft_strchr(char *string, char c)
+
+int ft_strchr_sec(char *string, char c)
 {
 	int i;
 
@@ -223,17 +225,19 @@ int ft_strchr(char *string, char c)
 	}
 	return (0);
 }
+
 int is_rederection(int token_type)
 {
 	if (token_type == TOKEN_REDIR_APPEND || token_type == TOKEN_REDIR_IN || token_type == TOKEN_REDIR_OUT || token_type == TOKEN_REDIR_HERE_DOC)
 		return (1);
 	return (0);
 }
+
 int random_case(Token *tokens)
 {
 	while (tokens)
 	{
-		if (is_rederection(tokens->type) && (ft_strchr(tokens->next->value,'(') || ft_strchr(tokens->next->value,')')))
+		if (is_rederection(tokens->type) && (ft_strchr_sec(tokens->next->value,'(') || ft_strchr_sec(tokens->next->value,')')))
 		{
 			printf("Syntax Error.\n");
 			return(1);
@@ -256,7 +260,7 @@ int check_syntax_errors(Token *tokens)
 		return (5);
 	if (handle_consecutive_operator(tokens))
 		return (4);
-	if (random_case(tokens))
+	if (random_case(tokens)) //> hola(ls && pwd)  
 		return (2);
 	printf("check\n");
     return (0);

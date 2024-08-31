@@ -156,9 +156,9 @@ int	main(void)
 {
 	char	*input;
 	Token	**tokens;
-    t_queue *queue;
-    t_ast   *ast;
-    int     errno;
+    // t_queue *queue;
+    // t_ast   *ast;
+    // int     errno;
 
 	tokens = NULL;
     handle_signal();
@@ -166,15 +166,16 @@ int	main(void)
 	{
 		input = readline("Minishell$ ");
 		tokens = tokenize(input);
+        printf("check_here\n");
         // expand(*tokens);
-        // print_tokens(*tokens);
+        print_tokens(*tokens);
         // exit(1);
-        errno = check_syntax_errors(*tokens);
-        if(errno)
-            exit(errno);
-        queue = generate_postfix(*tokens);
-		ast = generate_ast_from_postfix(queue);
-		print_ast(ast, 5);
+        // errno = check_syntax_errors(*tokens);
+        // if(errno)
+        //     exit(errno);
+        // queue = generate_postfix(*tokens);
+		// ast = generate_ast_from_postfix(queue);
+		// print_ast(ast, 5);
 	}
 	return (0);
 }
