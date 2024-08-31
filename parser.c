@@ -56,8 +56,18 @@ int handle_parentheses(Token *token)
 	Token *current;
     int open_parentheses;
 	
-	open_parentheses = 0;
 	current = token;
+	while(current)
+	{
+		if(!strcmp("()", token->value))
+		{
+			printf("Syntax Error.\n");
+			return (1);
+		}
+		current = current->next;
+	}
+	current = token;
+	open_parentheses = 0;
 	if (current->type == TOKEN_OPEN_PARENTH)
         open_parentheses++;
     else if (current->type == TOKEN_CLOSE_PARENTH)
@@ -200,8 +210,38 @@ void update_tokens(Token **tokens)
         current = current->next;
     }
 }
+int ft_strchr(char *string, char c)
+{
+	int i;
 
-
+	i = 0;
+	while(string[i])
+	{
+		if(string[i] == c)
+			return (1);
+		i++;
+	}
+	return (0);
+}
+int is_rederection(int token_type)
+{
+	if (token_type == TOKEN_REDIR_APPEND || token_type == TOKEN_REDIR_IN || token_type == TOKEN_REDIR_OUT || token_type == TOKEN_REDIR_HERE_DOC)
+		return (1);
+	return (0);
+}
+int random_case(Token *tokens)
+{
+	while (tokens)
+	{
+		if (is_rederection(tokens->type) && (ft_strchr(tokens->next->value,'(') || ft_strchr(tokens->next->value,')')))
+		{
+			printf("Syntax Error.\n");
+			return(1);
+		}
+		tokens = tokens->next;
+	}
+	return (0);
+}
 
 int check_syntax_errors(Token *tokens)
 {
@@ -216,6 +256,8 @@ int check_syntax_errors(Token *tokens)
 		return (5);
 	if (handle_consecutive_operator(tokens))
 		return (4);
+	if (random_case(tokens))
+		return (2);
 	printf("check\n");
     return (0);
 }

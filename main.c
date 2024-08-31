@@ -166,9 +166,9 @@ int	main(void)
 	{
 		input = readline("Minishell$ ");
 		tokens = tokenize(input);
-        expand(*tokens);
-        print_tokens(*tokens);
-        exit(1);
+        // expand(*tokens);
+        // print_tokens(*tokens);
+        // exit(1);
         errno = check_syntax_errors(*tokens);
         if(errno)
             exit(errno);
