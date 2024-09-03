@@ -134,7 +134,7 @@ int handle_operators_bg_en(Token *tokens)
 	}
 	return (0);
 }
-
+//
 char *ft_strncpy(char *dest, char *src, int n)
 {
 	int i;

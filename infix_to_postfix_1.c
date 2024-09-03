@@ -84,7 +84,7 @@ int check_precedence(t_stack *stack, int token_type)
 	return (1);
 }
 
-t_queue *generate_postfix(Token *tokens)
+t_queue *generate_postfix(t_parser *tokens)
 {
     t_stack *head;
     t_queue *output_queue;

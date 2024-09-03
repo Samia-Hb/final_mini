@@ -115,7 +115,7 @@ typedef struct queue
 
 typedef struct stack
 {
-	Token			*node;   // Changed to t_ast pointer
+	t_parser			*node;   // Changed to t_ast pointer
 	struct stack	*next;
 }					t_stack;
 

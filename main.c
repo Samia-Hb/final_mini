@@ -75,12 +75,11 @@ int	main(void)
 {
 	char	*input;
 	Token	**tokens;
-    // t_queue *queue;
-    // t_ast   *ast;
+    t_queue *queue;
+    t_ast   *ast;
     int     errno;
-    t_parser *parse;
+    t_parser *parsed;
 
-    int i;
 	tokens = NULL;
     handle_signal();
 	while (1)
@@ -91,23 +90,10 @@ int	main(void)
         errno = check_syntax_errors(*tokens);
         if (errno)
             exit(errno);
-        // expand(*tokens);
-        parse = analyse_tokens(tokens);
-        while (parse)
-        {
-            i = 0;
-            printf("command = %s\n", parse->token->value);
-            while(parse->arguments[i])
-            {
-                printf("---->argument %d = %s\n", i,parse->arguments[i]->value);
-                i++;
-            }
-            parse = parse->next;
-        }
-        exit(1);
-        // queue = generate_postfix(*tokens);
-		// ast = generate_ast_from_postfix(queue);
-		// print_ast(ast, 5);
+        parsed = analyse_tokens(tokens);
+        queue = generate_postfix(parsed);
+		ast = generate_ast_from_postfix(queue);
+		print_ast(ast, 5);
 	}
 	return (0);
 }

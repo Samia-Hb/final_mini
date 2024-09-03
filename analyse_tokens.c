@@ -30,19 +30,24 @@ int nbr_argument(Token *tokens)
 void create_node_arguments(t_parser **node, Token **tokens)
 {
     int i;
+    int num_args;
 
     i = 0;
+    num_args = nbr_argument(*tokens);
     (*tokens) = (*tokens)->next;
-    (*node)->arguments = malloc(nbr_argument(*tokens) * sizeof(Token));
-    if (!(*node)->arguments)
-        exit(1);
+    (*node)->arguments = malloc((num_args + 1) * sizeof(Token *));
+    if (!(*node)->arguments) {
+        perror("malloc failed");
+        exit(EXIT_FAILURE);
+    }
     while (*tokens && !is_operator(*tokens) &&
-        (*tokens)->type != TOKEN_COMMAND && (*tokens)->type != TOKEN_BUILT_IN)
-        {
-            (*node)->arguments[i] = (*tokens);
-            (*tokens) = (*tokens)->next;
-            i++;
-        }
+           (*tokens)->type != TOKEN_COMMAND && (*tokens)->type != TOKEN_BUILT_IN)
+           {
+        (*node)->arguments[i] = *tokens;
+        (*tokens) = (*tokens)->next;
+        i++;
+    }
+    (*node)->arguments[i] = NULL;
 }
 
 t_parser *analyse_tokens(Token **tokens)
@@ -53,7 +58,7 @@ t_parser *analyse_tokens(Token **tokens)
     new = NULL;
     while (*tokens)
     {
-        node = malloc(sizeof(t_parser *));
+        node = malloc(sizeof(t_parser));
         if (!node)
         {
             printf("allocation failed\n");
@@ -69,5 +74,6 @@ t_parser *analyse_tokens(Token **tokens)
             (*tokens) = (*tokens)->next;
         push_back(&new, node);
     }
+    free(tokens);
     return new;
 }
