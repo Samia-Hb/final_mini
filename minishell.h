@@ -67,6 +67,7 @@ typedef enum
 	TOKEN_COMMAND,
 	TOKEN_OPTION,
 	TOKEN_DOUBLE_QUOTED,
+	TOKEN_BUILT_IN,
 	TOKEN_SINGLE_QUOTED,
 	TOKEN_ARGUMENT, // String
 	TOKEN_UNKNOWN
@@ -81,14 +82,14 @@ typedef struct token
 	struct token	*previous;
 }					Token;
 
-typedef struct command
-{
-	char	*command;
-	char	**arguments;
-	int		stdin_file;
-	int		stdout_file;
-	char	*operator;
-}t_parser;
+// typedef struct command
+// {
+// 	char	*command;
+// 	char	**arguments;
+// 	int		stdin_file;
+// 	int		stdout_file;
+// 	char	*operator;
+// }t_parser;
 
 typedef struct ASTNode
 {

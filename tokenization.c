@@ -51,7 +51,9 @@ void free_tokens(Token *tokens)
 
 int ft_is_separator(char c)
 {
-    return strchr("><| ()[]", c) != NULL;
+	if(c == '>' || c == '<' || c == '\n' || c == '\t' ||c == '|' || c == ' ' || c == '\'')
+	    return 1;
+	return (0);
 }
 
 char *handle_Parentheses(char *str, char c)
@@ -59,15 +61,8 @@ char *handle_Parentheses(char *str, char c)
     int i = 1;
     int j = 0;
     char *word;
-    char close_parenth;
 
-    if (c == '(')
-        close_parenth = ')';
-    else if (c == '[')
-        close_parenth = ']';
-    else
-        close_parenth = '}';
-    while (str[i] && str[i] != close_parenth)
+    while (str[i] && !isspace(str[i]))
     {
         if (str[i] == '\\' && str[i + 1] == c)
             i += 2;
@@ -75,20 +70,15 @@ char *handle_Parentheses(char *str, char c)
             i++;
         j++;
     }
-    if (str[i] != close_parenth)
+    word = malloc(j + 1);
+    if (!word)
     {
-        fprintf(stderr, "Error: unclosed quote\n");
-        exit(EXIT_FAILURE);
-    }
-    word = malloc(j + 3);
-    if (!word) {
         fprintf(stderr, "Error: memory allocation failed\n");
         exit(EXIT_FAILURE);
     }
     word[0] = c;
     strncpy(word + 1, str + 1, j);
-    word[j + 1] = close_parenth;
-    word[j + 2] = '\0';
+    word[j] = '\0';
     return word;
 }
 
@@ -138,7 +128,13 @@ char *handle_quote(char *str, char c)
     word[i] = '\0';
     return word;
 }
-
+int built_in_checker(const char *str)
+{
+    if (!strcmp(str,"export") || !strcmp(str,"cd") || !strcmp(str,"pwd") ||
+		!strcmp(str,"echo") || !strcmp(str,"unset") || !strcmp(str,"env") || !strcmp(str,"exit"))
+        return (1);
+    return (0);
+}
 
 int get_token_type(const char *token, char c)
 {
@@ -148,6 +144,8 @@ int get_token_type(const char *token, char c)
             return TOKEN_DOUBLE_QUOTED;
         return TOKEN_SINGLE_QUOTED;
     }
+    if (built_in_checker(token))
+        return TOKEN_BUILT_IN;
     if (get_executable((char *)token))
         return TOKEN_COMMAND;
     if (!strcmp(token, "?"))
@@ -179,7 +177,8 @@ int get_token_type(const char *token, char c)
     return TOKEN_UNKNOWN;
 }
 
-Token **ft_append_identifier(char *input, Token **token_list, int *tmp, int *j) {
+Token **ft_append_identifier(char *input, Token **token_list, int *tmp, int *j)
+{
     int i = 0;
     int k = 0;
     char *value;
@@ -330,15 +329,30 @@ char *handle_heredoc(char *input)
     delimiter[j] = '\0';
     if (!find_delimiter_in_lines(input, delimiter, &l))
 	{
-        printf("Undefined Delimiter in here-doc\n");
+        printf("Syntax Error.\n");
         free(delimiter);
         exit(1);
     }
     free(delimiter);
     return heredoc_token(input, l);
 }
+char *handle_dollar(char *str)
+{
+    int i;
+    char *word;
 
-Token **tokenize(char *input) {
+    i = 0;
+    while (str[i] && !isspace(str[i]))
+        i++;
+    word = (char *)malloc(i + 1);
+    if (!word)
+        return NULL;
+    word = strncpy(word, str,i);
+    return word;
+}
+
+Token **tokenize(char *input)
+{
     Token **tokens;
     int len;
     int i = 0;
@@ -357,6 +371,13 @@ Token **tokenize(char *input) {
     {
         if (input[i] == ' ' || input[i] == '\t')
             i++;
+        else if ((input[i] == '\\' && (input[i + 1] == '"' || input[i] == '\''))||(input[i] == '"' || input[i] == '\''))
+        {
+            word = handle_quote(input + i, input[i]);
+            add_token(tokens, get_token_type(word, input[i]), word);
+            i += strlen(word);
+            free(word);
+        }
         else if (input[i] == '&' && input[i+1] != '&')
         {
             add_token(tokens, TOKEN_AMPERSAND, "&");
@@ -364,8 +385,9 @@ Token **tokenize(char *input) {
         }
         else if (input[i] == '$')
         {
-            add_token(tokens, TOKEN_DOLLAR, "$");
-            i++;
+            word = handle_dollar(input+i); 
+            add_token(tokens, TOKEN_DOLLAR, word);
+            i += strlen(word);
         }
         else if (input[i] == '<' && input[i + 1] && input[i+1] == '<')
         {
@@ -380,29 +402,17 @@ Token **tokenize(char *input) {
             i += strlen(word);
             free(word);
         }
-        else if ((input[i] == '"' || input[i] == '\'') && (i == 0 || input[i - 1] != '\\'))
-        {
-            word = handle_quote(input + i, input[i]);
-            add_token(tokens, get_token_type(word, input[i]), word);
-            i += strlen(word);
-            free(word);
-        }else if ((input[i] == '&' && i + 1 < len && input[i + 1] == '&') ||
+        else if ((input[i] == '&' && i + 1 < len && input[i + 1] == '&') ||
                    (input[i] == '|' && i + 1 < len && input[i + 1] == '|')) {
             char *op = char_to_string(input[i], input[i + 1]);
             add_token(tokens, get_token_type(op, 0), op);
             free(op);
             i += 2;
         }
-        else if (strchr("~?&.`$><(){}[]|;", input[i])) {
-            char *op = char_to_string(input[i], 0);
-            add_token(tokens, get_token_type(op, 0), op);
-            free(op);
-            i++;
-        }
         else if (input[i] == '-')
         {
             start = i;
-            while (i < len && input[i] != ' ' && input[i] != '|' && !ft_is_separator(input[i]))
+            while (i < len && !ft_is_separator(input[i]))
             {
                 i++;
             }
@@ -412,8 +422,11 @@ Token **tokenize(char *input) {
         } else
         {
             start = i;
-            while (input[i] && !ft_is_separator(input[i]) && input[i] != ' ' && input[i] != '&')
+            while (input[i] && !ft_is_separator(input[i]))
+            {
+                if(input[i])
                 i++;
+            }
             word = strndup(input + start, i - start);
             add_token(tokens, get_token_type(word, 0), word);
             free(word);
