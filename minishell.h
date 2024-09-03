@@ -82,14 +82,12 @@ typedef struct token
 	struct token	*previous;
 }					Token;
 
-// typedef struct command
-// {
-// 	char	*command;
-// 	char	**arguments;
-// 	int		stdin_file;
-// 	int		stdout_file;
-// 	char	*operator;
-// }t_parser;
+typedef struct parse
+{
+	Token *token;
+	Token   **arguments;
+	struct parse *next;
+}t_parser;
 
 typedef struct ASTNode
 {
@@ -170,5 +168,8 @@ void handle_signal();
 
 			//expand
 void expand(Token *tokens);
+
+				//analyse_tokens
+t_parser *analyse_tokens(Token **tokens);
 
 #endif

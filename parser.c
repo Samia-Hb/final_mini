@@ -262,6 +262,5 @@ int check_syntax_errors(Token *tokens)
 		return (4);
 	if (random_case(tokens)) //> hola(ls && pwd)  
 		return (2);
-	printf("check\n");
     return (0);
 }

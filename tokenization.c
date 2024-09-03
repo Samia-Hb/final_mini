@@ -383,6 +383,11 @@ Token **tokenize(char *input)
             add_token(tokens, TOKEN_AMPERSAND, "&");
             i++;
         }
+        else if (input[i] == '|' && input[i + 1] != '|')
+        {
+            add_token(tokens, TOKEN_PIPE, "|");
+            i++;
+        }
         else if (input[i] == '$')
         {
             word = handle_dollar(input+i); 
