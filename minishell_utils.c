@@ -21,7 +21,7 @@ t_stack *push_stack(t_stack *stack, Token *node)
 	head = malloc(sizeof(t_stack));
 	if (!head)
 		return (NULL);
-	head->node = node;
+	head->node->token = node;
 	head->next = stack;
 	return head;
 }

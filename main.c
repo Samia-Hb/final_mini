@@ -70,21 +70,32 @@ void print_tokens(Token *tokens)
         (tokens) = (tokens)->next;
     }
 }
+void ft_clean(t_queue *queue, t_ast *ast, t_parser *parser)
+{
+    if (queue)
+        free(queue);
+    if (ast)
+        free(ast);
+    if (parser)
+        free(parser);
+}
 
 int	main(void)
 {
-	char	*input;
-	Token	**tokens;
-    t_queue *queue;
-    t_ast   *ast;
-    int     errno;
-    t_parser *parsed;
+	char	    *input;
+	Token	    **tokens;
+    t_queue     *queue;
+    t_ast       *ast;
+    int         errno;
+    t_parser    *parsed;
 
 	tokens = NULL;
-    handle_signal();
 	while (1)
 	{
+        handle_signal();
 		input = readline("Minishell$ ");
+        if(!input)
+            break ;
         add_history(input);
 		tokens = tokenize(input);
         errno = check_syntax_errors(*tokens);
@@ -95,5 +106,6 @@ int	main(void)
 		ast = generate_ast_from_postfix(queue);
 		print_ast(ast, 5);
 	}
+    ft_clean(queue, ast, parsed);
 	return (0);
 }

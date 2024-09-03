@@ -1,5 +1,5 @@
 #include "minishell.h"
-t_stack *new_stack_node(Token *token)
+t_stack *new_stack_node(t_parser *token)
 {
     t_stack *new_node = (t_stack *)malloc(sizeof(t_stack));
     new_node->node = token;
@@ -7,27 +7,27 @@ t_stack *new_stack_node(Token *token)
     return new_node;
 }
 
-void push(t_stack **stack, Token *token)
+void push(t_stack **stack, t_parser *token)
 {
     t_stack *new_node = new_stack_node(token);
     new_node->next = *stack;
     *stack = new_node;
 }
 
-Token *pop(t_stack **stack)
+t_parser *pop(t_stack **stack)
 {
     if (!*stack)
         return NULL;
     t_stack *temp = *stack;
-    Token *token = temp->node;
+    t_parser *token = temp->node;
     *stack = temp->next;
     free(temp);
     return token;
 }
 
-void transfer_tokens_to_stack(Token *token_list, t_stack **stack)
+void transfer_tokens_to_stack(t_parser *token_list, t_stack **stack)
 {
-    Token *current = token_list;
+    t_parser *current = token_list;
     t_stack *node;
     while (current != NULL)
     {

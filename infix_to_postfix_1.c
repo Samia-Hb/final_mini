@@ -28,10 +28,11 @@ t_stack *create_node(Token *token)
     node = malloc(sizeof(t_stack));
     if(!node)
         return (NULL);
-    node->node = token;
+    node->node->token = token;
     node->next = NULL;
     return (node);
 }
+
 void enqueue(t_queue **queue, Token *token)
 {
     t_queue *new_node;
@@ -53,12 +54,13 @@ void enqueue(t_queue **queue, Token *token)
 
 void push_to_stack(t_stack **src, t_stack **dest)
 {
-	t_stack *head;
+    t_stack *head;
 
-	head = pop_stack(src);
-	head->next = *dest;
+    head = pop_stack(src);
+    head->next = *dest;
     *dest = head;
 }
+
 int get_precedence(int type)
 {
     if (type == TOKEN_OPEN_PARENTH || type == TOKEN_CLOSE_PARENTH)
@@ -66,10 +68,10 @@ int get_precedence(int type)
     if (type == TOKEN_DOUBLE_AMP || type == TOKEN_DOUBLE_PIPE)
         return (3);
     if (type == TOKEN_PIPE)
-        return (2);  // Pipe should have lower precedence than redirection
+        return (2);
     if (type == TOKEN_REDIR_APPEND || type == TOKEN_REDIR_HERE_DOC 
         || type == TOKEN_REDIR_OUT || type == TOKEN_REDIR_IN)
-        return (1);  // Redirection operators should have higher precedence
+        return (1);
     return (0);
 }
 
@@ -77,7 +79,7 @@ int check_precedence(t_stack *stack, int token_type)
 {
 	while (stack)
 	{
-		if (get_precedence(token_type) >= get_precedence(stack->node->type))
+		if (get_precedence(token_type) >= get_precedence(stack->node->token->type))
 			return (0);
 		stack = stack->next;
 	}
@@ -97,9 +99,9 @@ t_queue *generate_postfix(t_parser *tokens)
     transfer_tokens_to_stack(tokens, &head);
     while (head)
     {
-        if (is_operand(head->node))
+        if (is_operand(head->node->token))
         {
-            enqueue(&output_queue, head->node);
+            enqueue(&output_queue, head->node->token);
             head = head->next;
         }
         else
@@ -108,21 +110,21 @@ t_queue *generate_postfix(t_parser *tokens)
                 push_to_stack(&head, &operator_stack);
             else if (operator_stack)
             {
-                if (is_operator(head->node) && is_operator(operator_stack->node) && head->node->type != TOKEN_CLOSE_PARENTH)
+                if (is_operator(head->node->token) && is_operator(operator_stack->node->token) && head->node->token->type != TOKEN_CLOSE_PARENTH)
                 {
-                    while (operator_stack && (!check_precedence(operator_stack, head->node->type)))
+                    while (operator_stack && (!check_precedence(operator_stack, head->node->token->type)))
                     {
                         popped = pop_stack(&operator_stack);
-                        enqueue(&output_queue, popped->node);
+                        enqueue(&output_queue, popped->node->token);
                     }
                     push_to_stack(&head, &operator_stack);
                 }
-                if (head->node->type == TOKEN_CLOSE_PARENTH)
+                if (head->node->token->type == TOKEN_CLOSE_PARENTH)
                 {
-                    while (operator_stack && operator_stack->node->type != TOKEN_OPEN_PARENTH)
+                    while (operator_stack && operator_stack->node->token->type != TOKEN_OPEN_PARENTH)
                     {
                         popped = pop_stack(&operator_stack);
-                        enqueue(&output_queue, popped->node);
+                        enqueue(&output_queue, popped->node->token);
                     }
                     pop_stack(&operator_stack);
                     head = head->next;
@@ -133,7 +135,7 @@ t_queue *generate_postfix(t_parser *tokens)
     while (operator_stack)
     {
         popped = pop_stack(&operator_stack);
-        enqueue(&output_queue, popped->node);
+        enqueue(&output_queue, popped->node->token);
     }
     return output_queue;
 }

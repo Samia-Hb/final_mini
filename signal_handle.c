@@ -56,20 +56,3 @@ void handle_signal()
     signal(SIGTERM, handle_ctrl_d);
 }
 
-// int main()
-// {
-//     // Disable readline's internal signal handling
-//     rl_catch_signals = 0;
-//     handle_signal();
-//     while (1)
-//     {
-//         char *input = readline("Prompt> ");
-//         // if (!input) {
-//         //     break;  // Ctrl+D (EOF) pressed
-//         // }
-//         free(input);
-//     }
-
-//     return 0;
-// }
-

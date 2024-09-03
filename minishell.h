@@ -138,9 +138,9 @@ char	*get_executable(char *command);
 void	ft_parser(Token *tokens);
 
 			//generate_postfix
-t_queue *generate_postfix(Token *tokens);
+t_queue *generate_postfix(t_parser *tokens);
 int		get_precedence(int token_type);
-void	transfer_tokens_to_stack(Token *token_list, t_stack **stack);
+void	transfer_tokens_to_stack(t_parser *token_list, t_stack **stack);
 int		check_precedence(t_stack *stack, int token_type);
 void	push_back_stack(t_stack **src, t_stack **dest);
 
@@ -154,7 +154,7 @@ t_ast	*push_to_ast_stack(t_ast *ast_stack, t_ast *ast_node);
 
 			//mini_utils
 void	print_stack(t_stack *head);
-t_stack	*new_stack_node(Token *token);
+t_stack	*new_stack_node(t_parser *token);
 void	push_top_stack(t_stack **src, t_stack **dest);
 int		check_syntax_errors(Token *tokens);
 char	quote_type(const char *str);
@@ -165,7 +165,6 @@ void	print_tokens(Token *tokens);
 
 			//signals
 void handle_signal();
-
 			//expand
 void expand(Token *tokens);
 
