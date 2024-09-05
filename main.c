@@ -98,6 +98,7 @@ int	main(void)
             break ;
         add_history(input);
 		tokens = tokenize(input);
+        printf("check\n");
         errno = check_syntax_errors(*tokens);
         if (errno)
             exit(errno);

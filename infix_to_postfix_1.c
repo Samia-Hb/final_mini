@@ -26,11 +26,17 @@ t_stack *create_node(Token *token)
     t_stack *node;
 
     node = malloc(sizeof(t_stack));
-    if(!node)
+    if (!node)
         return (NULL);
+    node->node = malloc(sizeof(Token));
+    if (!node->node)
+    {
+        free(node);
+    return (NULL);
+    }
     node->node->token = token;
     node->next = NULL;
-    return (node);
+    return node;
 }
 
 void enqueue(t_queue **queue, Token *token)

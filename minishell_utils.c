@@ -16,15 +16,24 @@ int is_operand(Token *node)
 
 t_stack *push_stack(t_stack *stack, Token *node)
 {
-	t_stack *head;
+    t_stack *head;
 
-	head = malloc(sizeof(t_stack));
-	if (!head)
-		return (NULL);
-	head->node->token = node;
-	head->next = stack;
-	return head;
+    head = malloc(sizeof(t_stack));
+    if (!head)
+        return (NULL);
+    
+    // Allocate memory for head->node before using it
+    head->node = malloc(sizeof(Token)); // Assuming 'node' is a pointer to Token
+    if (!head->node) {
+        free(head);  // Clean up previously allocated memory
+        return (NULL);
+    }
+
+    head->node->token = node;
+    head->next = stack;
+    return head;
 }
+
 
 t_stack *pop_stack(t_stack **stack)
 {
