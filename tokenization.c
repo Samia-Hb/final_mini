@@ -378,14 +378,10 @@ Token **tokenize(char *input)
             i += strlen(word);
             free(word);
         }
-        else if (input[i] == '&' && input[i+1] != '&')
+        else if ((input[i] == '&' && input[i+1] != '&') || (input[i] == '|' && input[i + 1] != '|') || (input[i] == '<' && input[i + 1] != '<') || (input[i] == '>' && input[i + 1] != '>'))
         {
-            add_token(tokens, TOKEN_AMPERSAND, "&");
-            i++;
-        }
-        else if (input[i] == '|' && input[i + 1] != '|')
-        {
-            add_token(tokens, TOKEN_PIPE, "|");
+            char *op = char_to_string(input[i], 0);
+            add_token(tokens, get_token_type(op,0), op);
             i++;
         }
         else if (input[i] == '$')
@@ -424,7 +420,8 @@ Token **tokenize(char *input)
             word = strndup(input + start, i - start);
             add_token(tokens, TOKEN_OPTION, word);
             free(word);
-        } else
+        } 
+        else
         {
             start = i;
             while (input[i] && !ft_is_separator(input[i]))
@@ -437,5 +434,6 @@ Token **tokenize(char *input)
             free(word);
         }
     }
+    // printf("check\n");
     return tokens;
 }

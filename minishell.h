@@ -98,13 +98,25 @@ typedef struct ASTNode
 	struct ASTNode	*left;
 	struct ASTNode	*right;
 }					ASTNode;
+typedef enum 
+{
+	COMMAND,
+	PIPELINE,
+	REDERECTION_IN,
+	REDERECTION_OUT,
+	REDERECTION_APPEND,
+	REDERECTION_HEREDOC,
+	REDERECTION_SEMICOLON,
+}AST_TYPE;
 
 typedef struct s_ast
 {
 	ASTNode			*node; 
+	AST_TYPE		type;
 	struct s_ast	*left;
 	struct s_ast	*right;
 	struct s_ast	*next;
+
 }					t_ast;
 
 typedef struct queue
@@ -123,7 +135,7 @@ typedef struct stack
 Token	**tokenize(char *input);
 void	add_token(Token **tokens, TokenType type, const char *value);
 char	*handle_quote(char *str, char c);
-void	print_tokens(Token *tokens);
+// void	print_tokens(Token *tokens);
 
 			//**libft**/
 char	**ft_split(char *s, char c);
@@ -161,7 +173,7 @@ char	quote_type(const char *str);
 Token	*create_token(TokenType type, const char *value);
 char	*char_to_string(char c, char c2);
 int		get_token_type(const char *token, char c);
-void	print_tokens(Token *tokens);
+void print_tokens(t_parser *tokens);
 
 			//signals
 void handle_signal();
@@ -170,5 +182,9 @@ void expand(Token *tokens);
 
 				//analyse_tokens
 t_parser *analyse_tokens(Token **tokens);
+
+				//signals
+void handle_ctrl_c();
+void handle_ctrl_d();
 
 #endif

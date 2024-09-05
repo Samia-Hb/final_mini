@@ -30,6 +30,21 @@ t_ast *create_ast_node(Token *token)
     return (new_node);
 }
 
+AST_TYPE get_ast_type(TokenType type)
+{
+    if (type == TOKEN_PIPE)
+        return PIPELINE;
+    if (type == TOKEN_REDIR_IN)
+        return REDERECTION_IN;
+    if (type == TOKEN_REDIR_OUT)
+        return REDERECTION_OUT;
+    if (type == TOKEN_REDIR_HERE_DOC)
+        return REDERECTION_HEREDOC;
+    if (type == TOKEN_REDIR_APPEND)
+        return REDERECTION_APPEND;
+    return COMMAND;   
+}
+
 t_ast *generate_ast_from_postfix(t_queue *postfix_output)
 {
     t_ast   *ast_stack;
@@ -53,11 +68,12 @@ t_ast *generate_ast_from_postfix(t_queue *postfix_output)
             right_node = pop_ast_stack(&ast_stack);
             left_node = pop_ast_stack(&ast_stack);
             ast_node = create_ast_node(postfix_output->node);
+            ast_node->type = get_ast_type(postfix_output->node->type);
             ast_node->left = left_node;
             ast_node->right = right_node;
             ast_stack = push_to_ast_stack(ast_stack, ast_node);
         }
         postfix_output = postfix_output->next;
     }
-    return ast_stack;
+    return (ast_stack);
 }

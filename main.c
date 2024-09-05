@@ -62,11 +62,22 @@ void print_queue(t_queue *queue)
     }
 }
 
-void print_tokens(Token *tokens)
+void print_tokens(t_parser *tokens)
 {
+    int i;
+
     while (tokens)
     {
-        printf("data = %s type = %d\n", (tokens)->value, (tokens)->type);
+        printf ("=>data = %s type = %d\n", (tokens)->token->value, (tokens)->token->type);
+        i = 0;
+        if (tokens->arguments)
+        {
+            while (tokens->arguments[i])
+            {
+                printf("===>argument = %s\n", tokens->arguments[i]->value);
+                i++;
+            }
+        }
         (tokens) = (tokens)->next;
     }
 }
@@ -98,15 +109,11 @@ int	main(void)
             break ;
         add_history(input);
 		tokens = tokenize(input);
-        printf("check\n");
         errno = check_syntax_errors(*tokens);
-        if (errno)
-            exit(errno);
         parsed = analyse_tokens(tokens);
         queue = generate_postfix(parsed);
 		ast = generate_ast_from_postfix(queue);
-		print_ast(ast, 5);
+		// print_ast(ast, 5);
 	}
-    ft_clean(queue, ast, parsed);
 	return (0);
 }
