@@ -251,7 +251,7 @@ int check_syntax_errors(Token *tokens)
 {
 	if (handle_quotes(tokens))
 		return(1);
-	update_tokens(&tokens);
+	// update_tokens(&tokens);
 	if (handle_parentheses(tokens))
 		return(2);
 	if (handle_parentheses(tokens))

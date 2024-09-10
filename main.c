@@ -74,14 +74,14 @@ void print_tokens(t_parser *tokens)
         {
             while (tokens->arguments[i])
             {
-                printf("===>argument = %s\n", tokens->arguments[i]->value);
+                printf("===>argument = %s type = %d\n", tokens->arguments[i]->value , tokens->arguments[i]->type);
                 i++;
             }
         }
         (tokens) = (tokens)->next;
     }
 }
-void ft_clean(t_queue *queue, t_ast *ast, t_parser *parser)
+void ft_clean(t_queue *queue, char *input,t_ast *ast, t_parser *parser)
 {
     if (queue)
         free(queue);
@@ -89,6 +89,9 @@ void ft_clean(t_queue *queue, t_ast *ast, t_parser *parser)
         free(ast);
     if (parser)
         free(parser);
+    if (input)
+        free(input);
+    handle_ctrl_c();
 }
 
 int	main(void)
@@ -103,17 +106,30 @@ int	main(void)
 	tokens = NULL;
 	while (1)
 	{
-        handle_signal();
+		handle_signal();
 		input = readline("Minishell$ ");
-        if(!input)
-            break ;
         add_history(input);
+		if (!input)
+			break ;
 		tokens = tokenize(input);
+		while(*tokens)
+		{
+			printf("data = '%s' type = %d\n", (*tokens)->value, (*tokens)->type);
+			(*tokens) = (*tokens)->next;
+		}
+		exit(1);
         errno = check_syntax_errors(*tokens);
+        if (errno)
+            main();
+        //expand(*tokens);
         parsed = analyse_tokens(tokens);
+		print_tokens(parsed);
+		exit(1);
         queue = generate_postfix(parsed);
 		ast = generate_ast_from_postfix(queue);
-		// print_ast(ast, 5);
+		print_ast(ast, 5);
 	}
 	return (0);
 }
+        // print_tokens(parsed);
+        // exit(1);

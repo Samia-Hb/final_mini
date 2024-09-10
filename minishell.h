@@ -187,4 +187,7 @@ t_parser *analyse_tokens(Token **tokens);
 void handle_ctrl_c();
 void handle_ctrl_d();
 
+
+
+Token *get_last_token(Token *token);
 #endif

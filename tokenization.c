@@ -336,6 +336,7 @@ char *handle_heredoc(char *input)
     free(delimiter);
     return heredoc_token(input, l);
 }
+
 char *handle_dollar(char *str)
 {
     int i;
@@ -351,12 +352,112 @@ char *handle_dollar(char *str)
     return word;
 }
 
+int ft_strlen(char *str)
+{
+	int i;
+
+	i = 0;
+	while (str[i])
+	{
+		i++;
+	}
+	return (i);
+}
+
+
+void handle_operators(char *input, Token **tokens, int *j)
+{
+	int i;
+
+	i = 0;
+	if(input[i] == '>' || input[i] == '<' || input[i] == '|')
+	{
+		add_token(tokens, get_token_type(char_to_string(input[i], 0), 0), char_to_string(input[i], 0));
+        (*j)++;
+    }
+    else if (input[i] == '>' && input[i + 1] && input[i + 1] == '>')
+	{
+		add_token(tokens, get_token_type(char_to_string(input[i], 0), 0), char_to_string(input[i], 1));
+        (*j) +=2;
+	}
+}
+
+// void handle_word(char *input, Token **tokens, int *j)
+// {
+// 	int     i;
+// 	int		start;
+// 	int		k;
+// 	char    *word;
+//     Token   *last_token;
+
+// 	k = 0;
+// 	i = 0;
+// 	while (input[i] && !ft_is_separator(input[i]))
+// 	{
+// 		start = i;
+// 		while (input[i] && !ft_is_separator(input[i]))
+// 			i++;
+// 		word = strndup(input + start, i - start);
+// 		last_token = get_last_token(*tokens);
+// 		if ((last_token) && k == 1 && ((last_token->type == TOKEN_BUILT_IN ||
+// 			(last_token)->type == TOKEN_COMMAND)))
+// 			add_token(tokens, TOKEN_ARGUMENT, word);
+// 		else
+// 		{
+// 			k = 1;
+// 			if (built_in_checker(word))
+// 				add_token(tokens, TOKEN_BUILT_IN, word);
+// 			else if (get_executable(word))
+// 				add_token(tokens, TOKEN_COMMAND, word);
+// 		}
+// 		*j += i - start;
+// 		free(word);
+// 	}
+// }
+
+void handle_word(char *input, Token **tokens, int *j)
+{
+	int     i;
+	int		start;
+	int		k;
+	char    *word;
+    Token   *last_token;
+
+	k = 0;
+	i = 0;
+	while (input[i] && !ft_is_separator(input[i]))
+	{
+		start = i;
+		while (input[i] && !ft_is_separator(input[i]))
+		    i++;
+		word = strndup(input + start, i - start); // Correct strndup usage
+
+		last_token = get_last_token(*tokens);
+		// If we've already identified a command or built-in, treat all subsequent tokens as arguments
+		if (k == 1)
+		{
+			add_token(tokens, TOKEN_ARGUMENT, word);
+		}
+		else
+		{
+			// First word is considered a command or built-in, subsequent words will be arguments
+			if (built_in_checker(word))
+			    add_token(tokens, TOKEN_BUILT_IN, word);
+			else if (get_executable(word))
+			    add_token(tokens, TOKEN_COMMAND, word);
+			k = 1; // Mark that the first command has been identified
+		}
+
+		*j += i - start; // Increment *j based on input processing
+		free(word); // Free the word after adding the token
+	}
+}
+
+
 Token **tokenize(char *input)
 {
     Token **tokens;
-    int len;
-    int i = 0;
-    int start = 0;
+    int i ;
     char *word;
 
     tokens = (Token **)malloc(sizeof(Token *));
@@ -366,7 +467,7 @@ Token **tokenize(char *input)
         exit(EXIT_FAILURE);
     }
     *tokens = NULL;
-    len = strlen(input);
+	i = 0;
     while (input[i])
     {
         if (input[i] == ' ' || input[i] == '\t')
@@ -378,62 +479,17 @@ Token **tokenize(char *input)
             i += strlen(word);
             free(word);
         }
-        else if ((input[i] == '&' && input[i+1] != '&') || (input[i] == '|' && input[i + 1] != '|') || (input[i] == '<' && input[i + 1] != '<') || (input[i] == '>' && input[i + 1] != '>'))
-        {
-            char *op = char_to_string(input[i], 0);
-            add_token(tokens, get_token_type(op,0), op);
-            i++;
-        }
-        else if (input[i] == '$')
-        {
-            word = handle_dollar(input+i); 
-            add_token(tokens, TOKEN_DOLLAR, word);
-            i += strlen(word);
-        }
         else if (input[i] == '<' && input[i + 1] && input[i+1] == '<')
         {
             word = handle_heredoc(input+i);
             add_token(tokens, TOKEN_REDIR_HERE_DOC, word);
             i += strlen(word);
         }
-        else if ((input[i] == '(' || input[i] == '[' || input[i] == '{') && (input[i - 1] != '\\'))
-        {
-            word = handle_Parentheses(input + i, input[i]);
-            add_token(tokens, TOKEN_ARGUMENT, word);
-            i += strlen(word);
-            free(word);
-        }
-        else if ((input[i] == '&' && i + 1 < len && input[i + 1] == '&') ||
-                   (input[i] == '|' && i + 1 < len && input[i + 1] == '|')) {
-            char *op = char_to_string(input[i], input[i + 1]);
-            add_token(tokens, get_token_type(op, 0), op);
-            free(op);
-            i += 2;
-        }
-        else if (input[i] == '-')
-        {
-            start = i;
-            while (i < len && !ft_is_separator(input[i]))
-            {
-                i++;
-            }
-            word = strndup(input + start, i - start);
-            add_token(tokens, TOKEN_OPTION, word);
-            free(word);
-        } 
+		else if (input[i] == '>' || input[i] == '<' || input[i] == '|' ||
+			(input[i] == '>' && input[i + 1] && input[i + 1] == '>'))
+			handle_operators(input + i, tokens, &i);
         else
-        {
-            start = i;
-            while (input[i] && !ft_is_separator(input[i]))
-            {
-                if(input[i])
-                i++;
-            }
-            word = strndup(input + start, i - start);
-            add_token(tokens, get_token_type(word, 0), word);
-            free(word);
-        }
+			handle_word(input + i, tokens, &i);
     }
-    // printf("check\n");
     return tokens;
 }
