@@ -108,28 +108,29 @@ int	main(void)
 	{
 		handle_signal();
 		input = readline("Minishell$ ");
-        add_history(input);
 		if (!input)
 			break ;
+        add_history(input);
 		tokens = tokenize(input);
-		while(*tokens)
-		{
-			printf("data = '%s' type = %d\n", (*tokens)->value, (*tokens)->type);
-			(*tokens) = (*tokens)->next;
-		}
-		exit(1);
+        while(*tokens)
+        {
+            printf("token->data = %s token->type = %d\n",(*tokens)->value, (*tokens)->type);
+            (*tokens) = (*tokens)->next;
+        }
+        exit(1);
         errno = check_syntax_errors(*tokens);
         if (errno)
             main();
-        //expand(*tokens);
+        // expand(*tokens);
         parsed = analyse_tokens(tokens);
-		print_tokens(parsed);
-		exit(1);
         queue = generate_postfix(parsed);
 		ast = generate_ast_from_postfix(queue);
 		print_ast(ast, 5);
 	}
 	return (0);
 }
-        // print_tokens(parsed);
-        // exit(1);
+// print_tokens(parsed);
+// exit(1);
+
+// print_tokens(parsed);
+// exit(1);

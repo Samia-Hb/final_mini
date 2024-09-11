@@ -2,14 +2,14 @@
 
 int is_operator(Token *node)
 {
-    if (node->type == TOKEN_DOUBLE_QUOTED || node->type == TOKEN_SINGLE_QUOTED || node->type == TOKEN_COMMAND || node->type == TOKEN_OPTION || node->type == TOKEN_UNKNOWN || node->type == TOKEN_ARGUMENT)
+    if (node->type == TOKEN_DOUBLE_QUOTED || node->type == TOKEN_SINGLE_QUOTED || node->type == TOKEN_COMMAND || node->type == TOKEN_OPTION || node->type == TOKEN_BUILT_IN || node->type == TOKEN_UNKNOWN || node->type == TOKEN_ARGUMENT)
         return (0);
     return (1);
 }
 
 int is_operand(Token *node)
 {
-    if (node->type == TOKEN_UNKNOWN || node->type == TOKEN_DOUBLE_QUOTED || node->type == TOKEN_SINGLE_QUOTED || node->type == TOKEN_COMMAND || node->type == TOKEN_ARGUMENT || node->type == TOKEN_OPTION)
+    if (node->type == TOKEN_UNKNOWN || node->type == TOKEN_DOUBLE_QUOTED || node->type == TOKEN_SINGLE_QUOTED || node->type == TOKEN_COMMAND || node->type == TOKEN_BUILT_IN || node->type == TOKEN_ARGUMENT || node->type == TOKEN_OPTION)
         return (1);
     return (0);
 }

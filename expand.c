@@ -100,21 +100,15 @@ void expand_double_quote(Token *token)
 
 void expand(Token *tokens)
 {
-    Token *temp;
+    Token	*temp;
+    int		i;
 
     temp = tokens;
+    i = 0;
     while (temp)
     {
-        if (temp->type == TOKEN_COMMAND)
-            temp->expanded_value = get_executable(temp->value);
-        else if(temp->type == TOKEN_TILDLE)
-            temp->expanded_value = strdup(getenv("HOME"));
-        else if(temp->type == TOKEN_SINGLE_QUOTED)
-            temp->expanded_value = expand_single_quote(temp);
-        else if(temp->type == TOKEN_DOUBLE_QUOTED)
-            expand_double_quote(temp);
-        else 
-            temp->expanded_value = NULL;
+        if (temp->type == TOKEN_SINGLE_QUOTED)
+			expand_double_quote(temp);
         temp = temp->next;
     }
 }

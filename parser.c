@@ -256,11 +256,12 @@ int check_syntax_errors(Token *tokens)
 		return(2);
 	if (handle_parentheses(tokens))
 		return (3);
+	// printf("check\n");
 	if (handle_operators_bg_en(tokens))
 		return (5);
 	if (handle_consecutive_operator(tokens))
 		return (4);
 	if (random_case(tokens)) //> hola(ls && pwd)  
 		return (2);
-    return (0);
+	return (0);
 }
