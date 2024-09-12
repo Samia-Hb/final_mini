@@ -1,9 +1,9 @@
 #include <unistd.h>
 #include <stdio.h>
 
-int main(int argc, char **argv)
+int main(int argc, char **argv, char **env)
 {
-	char *arr;
-	getopt(argc, &argv[1], arr);
-	printf("%s\n", argv[1]);
+	// char *arr;
+	(void)argc;
+	execve("/usr/bin/env", &argv[1], env);
 }

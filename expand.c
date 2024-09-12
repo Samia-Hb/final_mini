@@ -83,6 +83,7 @@ void expand_double_quote(Token *token)
         if (token->value[i] == '$')
         {
             word = get_word_to_expand(token->value + i + 1);
+            // printf("word to expand = %s\n", word);
 			type = get_token_type(word, 0);
             if (type == TOKEN_COMMAND)
             {
@@ -107,7 +108,7 @@ void expand(Token *tokens)
     i = 0;
     while (temp)
     {
-        if (temp->type == TOKEN_SINGLE_QUOTED)
+        if (temp->type == TOKEN_DOUBLE_QUOTED)
 			expand_double_quote(temp);
         temp = temp->next;
     }

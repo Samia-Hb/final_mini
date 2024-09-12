@@ -84,35 +84,27 @@ char *handle_Parentheses(char *str, char c)
 
 char *handle_quote(char *str, char c)
 {
-	int i = 1;
-    int j = 0;
-    char *word;
+	int		i;
+    char	*word;
 
-    while (str[i] && str[i] != c && ft_is_separator(str[i]) && str[i])
+	i = 1;
+	if (strchr(str + 1, c))
 	{
-        i++;
-        while (str[i] == ' ')
-            i++;
-    }
-    while (ft_is_separator(str[i]))
-    {
-        i++;
-    }
-    word = malloc(j + 2);
-    if (!word)
+		while (str[i] && str[i] != c)
+			i++;
+		while (!ft_is_separator(str[i]))
+			i++;
+		word = strndup(str, i + 1);
+	}
+	else
 	{
-        fprintf(stderr, "Error: memory allocation failed\n");
-        exit(EXIT_FAILURE);
-    }
-    i = 0;
-    while (i <= j)
-    {
-        word[i] = str[i];
-        i++;
-    }
-    word[i] = '\0';
+		while (!ft_is_separator(str[i]))
+			i++;
+		word = strndup(str, i + 1);
+	}
     return word;
 }
+
 int built_in_checker(const char *str)
 {
     if (!strcmp(str,"export") || !strcmp(str,"cd") || !strcmp(str,"pwd") ||

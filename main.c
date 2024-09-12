@@ -112,12 +112,6 @@ int	main(void)
 			break ;
         add_history(input);
 		tokens = tokenize(input);
-        while(*tokens)
-        {
-            printf("token->data = %s token->type = %d\n",(*tokens)->value, (*tokens)->type);
-            (*tokens) = (*tokens)->next;
-        }
-        exit(1);
         errno = check_syntax_errors(*tokens);
         if (errno)
             main();
