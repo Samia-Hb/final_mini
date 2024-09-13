@@ -84,7 +84,7 @@ typedef struct token
 
 typedef struct parse
 {
-	Token *token;
+	Token		*token;
 	Token   **arguments;
 	struct parse *next;
 }t_parser;
@@ -92,12 +92,10 @@ typedef struct parse
 typedef struct ASTNode
 {
 	Token *token;
-	int				fd_in;
-	int				fd_out;
-	int				arg_nbr;
 	struct ASTNode	*left;
 	struct ASTNode	*right;
-}					ASTNode;
+}				ASTNode;
+
 typedef enum 
 {
 	COMMAND,

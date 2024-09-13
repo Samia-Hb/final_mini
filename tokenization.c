@@ -51,7 +51,7 @@ void free_tokens(Token *tokens)
 
 int ft_is_separator(char c)
 {
-	if(c == '>' || c == '<' || c == '\n' || c == '\t' ||c == '|' || c == ' ' || c == '\'')
+	if(c == '>' || c == '<' || c == '\n' || c == '\t' ||c == '|' || c == ' ' || c == '\t')
 	    return 1;
 	return (0);
 }

@@ -115,7 +115,13 @@ int	main(void)
         errno = check_syntax_errors(*tokens);
         if (errno)
             main();
-        // expand(*tokens);
+        expand(*tokens);
+        while(*tokens)
+        {
+            printf("token_value  = %s token_expanded = %s\n", (*tokens)->value, (*tokens)->expanded_value);
+            (*tokens) = (*tokens)->next;
+        }
+        exit(1);
         parsed = analyse_tokens(tokens);
         queue = generate_postfix(parsed);
 		ast = generate_ast_from_postfix(queue);
