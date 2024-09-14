@@ -116,12 +116,6 @@ int	main(void)
         if (errno)
             main();
         expand(*tokens);
-        while(*tokens)
-        {
-            printf("token_value  = %s token_expanded = %s\n", (*tokens)->value, (*tokens)->expanded_value);
-            (*tokens) = (*tokens)->next;
-        }
-        exit(1);
         parsed = analyse_tokens(tokens);
         queue = generate_postfix(parsed);
 		ast = generate_ast_from_postfix(queue);
@@ -129,8 +123,9 @@ int	main(void)
 	}
 	return (0);
 }
-// print_tokens(parsed);
-// exit(1);
-
-// print_tokens(parsed);
+// while(*tokens)
+// {
+//     printf("token_value  = %s token_expanded = %s\n", (*tokens)->value, (*tokens)->expanded_value);
+//     (*tokens) = (*tokens)->next;
+// }
 // exit(1);

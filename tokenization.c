@@ -366,10 +366,18 @@ void handle_word(char *input, Token **tokens, int *j, int *k)
     int		token_type;
 	char	*word;
     int		i;
+    char    *str;
 
     i = 0;
     while (input[i] && !ft_is_separator(input[i]))
+    {
+        if (input[i] == '"' || input[i]== '\'')
+        {
+            str = handle_quote(input + i, input[i]);
+            i += strlen(str);
+        }
         i++;
+    }
     word = strndup(input, i);
     token_type = get_token_type(word, 0);
     if ((token_type == 26 || token_type == 29) && *k == 0)
