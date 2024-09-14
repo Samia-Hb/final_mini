@@ -1,20 +1,22 @@
 #include "minishell.h"
 
-t_ast *create_ast_node(Token *token)
+t_ast *create_ast_node(t_queue *data)
 {
     t_ast *new_node;
     
     new_node = malloc(sizeof(t_ast));
     if (!new_node)
         return NULL;
-    new_node->token = malloc(sizeof(Token));
-    if (!new_node->token)
+    new_node->data = malloc(sizeof(t_parser));
+    new_node->data->token = malloc(sizeof(Token));
+    if (!new_node->data || !new_node->data->token)
     {
         free(new_node);
         return NULL;
     }
-    new_node->token->value = strdup(token->value);
-    new_node->token->type = token->type;
+    new_node->data->token->value = strdup(data->node->value);
+    new_node->data->token->type = data->node->type;
+	new_node->data->arguments = data->arg;
     new_node->left = NULL;
     new_node->right = NULL;
     new_node->next = NULL;
@@ -51,14 +53,14 @@ t_ast *generate_ast_from_postfix(t_queue *postfix_output)
     {
         if (is_operand(postfix_output->node))
         {
-            ast_node = create_ast_node(postfix_output->node);
+            ast_node = create_ast_node(postfix_output);
             ast_stack = push_to_ast_stack(ast_stack, ast_node);
         }
         else if (is_operator(postfix_output->node))
         {
             right_node = pop_ast_stack(&ast_stack);
             left_node = pop_ast_stack(&ast_stack);
-            ast_node = create_ast_node(postfix_output->node);
+            ast_node = create_ast_node(postfix_output);
             ast_node->type = get_ast_type(postfix_output->node->type);
             ast_node->left = left_node;
             ast_node->right = right_node;

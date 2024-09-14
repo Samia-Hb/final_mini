@@ -12,8 +12,8 @@ void print_ast(t_ast *ast, int depth)
         printf("    ");
         i++;
     }
-    if (ast && ast->token)
-        printf("Token: %s (Type: %d)\n", ast->token->value, ast->token->type);
+    if (ast && ast->data->token)
+        printf("Token: %s (Type: %d)\n", ast->data->token->value, ast->data->token->type);
     else
         printf("NULL Token\n");
     print_ast(ast->left, depth + 1);
@@ -55,9 +55,20 @@ t_ast *pop_ast_stack(t_ast **ast_stack)
 
 void print_queue(t_queue *queue)
 {
+    int i;
+
     while (queue)
     {
-        printf("queue_data = %s\n", queue->node->value);
+        printf("command = %s\n", queue->node->value);
+        if(queue->arg)
+        {
+            i = 0;
+            while (queue->arg[i])
+            {
+                printf("argc  ====== %s\n", queue->arg[i]->value);
+                i++;
+            }
+        }
         queue = queue ->next;
     }
 }

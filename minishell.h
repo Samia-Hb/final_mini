@@ -74,11 +74,6 @@ typedef struct parse
 	struct parse *next;
 }t_parser;
 
-typedef struct ASTNode
-{
-	Token *token;
-}				ASTNode;
-
 typedef enum 
 {
 	COMMAND,
@@ -92,7 +87,7 @@ typedef enum
 
 typedef struct s_ast
 {
-	Token			*token; 
+	t_parser		*data;
 	AST_TYPE		type;
 	struct s_ast	*left;
 	struct s_ast	*right;
@@ -102,13 +97,14 @@ typedef struct s_ast
 typedef struct queue
 {
 	Token			*node;
+	Token			**arg;
 	struct queue	*next;
 }					t_queue;
 
 typedef struct stack
 {
 	t_parser			*node;   // Changed to t_ast pointer
-	struct stack	*next;
+	struct stack		*next;
 }					t_stack;
 
 			//**Tokenization**/
@@ -162,4 +158,6 @@ void handle_ctrl_c();
 void handle_ctrl_d();
 
 Token *get_last_token(Token *token);
+
+void print_queue(t_queue *queue);
 #endif

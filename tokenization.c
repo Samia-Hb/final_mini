@@ -374,7 +374,7 @@ void handle_word(char *input, Token **tokens, int *j, int *k)
     }
     word = strndup(input, i);
     token_type = get_token_type(word, 0);
-    if ((token_type == 26 || token_type == 29) && *k == 0)
+    if ((token_type == 14 || token_type == 11) && *k == 0)
     {
         add_token(tokens, token_type, word);
         *k = 1;
