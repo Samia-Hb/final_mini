@@ -38,23 +38,8 @@
 
 typedef enum
 {
-	TOKEN_WHITESPACES,    // (” “, “\t”, etc.
-	TOKEN_NEW_LINE,       // "\n"
-	TOKEN_COLON,          // ";"
-	TOKEN_SLASH,          // "/"
-	TOKEN_ASTERISK,       // "*" wildcard
-	TOKEN_EQUALS,         // "="
-	TOKEN_PLUS,           // "+"
-	TOKEN_EXCLAMATION,    // "!"
-	TOKEN_AMPERSAND,      // "&"
 	TOKEN_DOUBLE_AMP,     // "&&"
-	TOKEN_BACKTICK,       // "`"
 	TOKEN_TILDLE,         // "~"
-	TOKEN_SEMICOLON,      // ";"
-	TOKEN_BACKSLASH,      // "\"
-	TOKEN_DOT,            // "."
-	TOKEN_QUESTION,       // "?""
-	TOKEN_MINUS,          // "-"
 	TOKEN_PIPE,           // "|"
 	TOKEN_DOUBLE_PIPE,    // "||"
 	TOKEN_REDIR_IN,       //"<"
@@ -92,8 +77,6 @@ typedef struct parse
 typedef struct ASTNode
 {
 	Token *token;
-	struct ASTNode	*left;
-	struct ASTNode	*right;
 }				ASTNode;
 
 typedef enum 
@@ -109,12 +92,11 @@ typedef enum
 
 typedef struct s_ast
 {
-	ASTNode			*node; 
+	Token			*token; 
 	AST_TYPE		type;
 	struct s_ast	*left;
 	struct s_ast	*right;
 	struct s_ast	*next;
-
 }					t_ast;
 
 typedef struct queue
@@ -139,13 +121,9 @@ char	*handle_quote(char *str, char c);
 char	**ft_split(char *s, char c);
 char	*ft_strjoin(char const *s1, char const *s2);
 char	*ft_strtrim(char *s1, char *set);
-char	*ft_substr(char *s, unsigned int start, size_t len);
 
 		    //pipex_utils
 char	*get_executable(char *command);
-
-			//parser
-void	ft_parser(Token *tokens);
 
 			//generate_postfix
 t_queue *generate_postfix(t_parser *tokens);
@@ -163,9 +141,7 @@ int		is_operand(Token *node);
 t_ast	*push_to_ast_stack(t_ast *ast_stack, t_ast *ast_node);
 
 			//mini_utils
-void	print_stack(t_stack *head);
 t_stack	*new_stack_node(t_parser *token);
-void	push_top_stack(t_stack **src, t_stack **dest);
 int		check_syntax_errors(Token *tokens);
 char	quote_type(const char *str);
 Token	*create_token(TokenType type, const char *value);
@@ -184,8 +160,6 @@ t_parser *analyse_tokens(Token **tokens);
 				//signals
 void handle_ctrl_c();
 void handle_ctrl_d();
-
-
 
 Token *get_last_token(Token *token);
 #endif

@@ -12,8 +12,8 @@ void print_ast(t_ast *ast, int depth)
         printf("    ");
         i++;
     }
-    if (ast->node && ast->node->token)
-        printf("Token: %s (Type: %d)\n", ast->node->token->value, ast->node->token->type);
+    if (ast && ast->token)
+        printf("Token: %s (Type: %d)\n", ast->token->value, ast->token->type);
     else
         printf("NULL Token\n");
     print_ast(ast->left, depth + 1);
@@ -123,9 +123,3 @@ int	main(void)
 	}
 	return (0);
 }
-// while(*tokens)
-// {
-//     printf("token_value  = %s token_expanded = %s\n", (*tokens)->value, (*tokens)->expanded_value);
-//     (*tokens) = (*tokens)->next;
-// }
-// exit(1);

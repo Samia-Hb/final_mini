@@ -7,23 +7,14 @@ t_ast *create_ast_node(Token *token)
     new_node = malloc(sizeof(t_ast));
     if (!new_node)
         return NULL;
-    new_node->node = malloc(sizeof(ASTNode));
-    if (!new_node->node)
+    new_node->token = malloc(sizeof(Token));
+    if (!new_node->token)
     {
         free(new_node);
         return NULL;
     }
-    new_node->node->token = malloc(sizeof(Token));
-    if (!new_node->node->token)
-    {
-        free(new_node->node);
-        free(new_node);
-        return NULL;
-    }
-    new_node->node->token->value = strdup(token->value);
-    new_node->node->token->type = token->type;
-    new_node->node->left = NULL;
-    new_node->node->right = NULL;
+    new_node->token->value = strdup(token->value);
+    new_node->token->type = token->type;
     new_node->left = NULL;
     new_node->right = NULL;
     new_node->next = NULL;

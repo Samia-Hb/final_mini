@@ -125,12 +125,8 @@ int get_token_type(const char *token, char c)
         return TOKEN_BUILT_IN;
     if (get_executable((char *)token))
         return TOKEN_COMMAND;
-    if (!strcmp(token, "?"))
-        return TOKEN_QUESTION;
     if (!strcmp(token, "~"))
         return TOKEN_TILDLE;
-    if (!strcmp(token, "."))
-        return TOKEN_DOT;
     if (!strcmp(token, "<<"))
         return TOKEN_REDIR_HERE_DOC;
     if (!strcmp(token, ">"))
@@ -145,8 +141,6 @@ int get_token_type(const char *token, char c)
         return TOKEN_DOUBLE_PIPE;
     if (!strcmp(token, "&&"))
         return TOKEN_DOUBLE_AMP;
-    if (!strcmp(token, ";"))
-        return TOKEN_SEMICOLON;
     if (!strcmp(token, "(") || !strcmp(token, "[") || !strcmp(token, "{"))
         return TOKEN_OPEN_PARENTH;
     if (!strcmp(token, ")") || !strcmp(token, "]") || !strcmp(token, "}"))
