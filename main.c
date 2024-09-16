@@ -92,6 +92,7 @@ void print_tokens(t_parser *tokens)
         (tokens) = (tokens)->next;
     }
 }
+
 void ft_clean(t_queue *queue, char *input,t_ast *ast, t_parser *parser)
 {
     if (queue)
@@ -107,8 +108,8 @@ void ft_clean(t_queue *queue, char *input,t_ast *ast, t_parser *parser)
 
 int	main(void)
 {
-	char	    *input;
-	Token	    **tokens;
+    char	    *input;
+    Token	    **tokens;
     t_queue     *queue;
     t_ast       *ast;
     int         errno;
@@ -123,6 +124,8 @@ int	main(void)
 			break ;
         add_history(input);
 		tokens = tokenize(input);
+        exit(1);
+        // printf("check here\n");
         errno = check_syntax_errors(*tokens);
         if (errno)
             main();

@@ -249,6 +249,7 @@ int random_case(Token *tokens)
 
 int check_syntax_errors(Token *tokens)
 {
+	// printf("check\n");
 	if (handle_quotes(tokens))
 		return(1);
 	// update_tokens(&tokens);

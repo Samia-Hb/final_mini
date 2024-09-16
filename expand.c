@@ -91,6 +91,35 @@ char *single_quote_expansion(char *input, int *i)
 	return (expanded_value);
 }
 
+char *get_delimiter(char *input)
+{
+	int i;
+	char *result;
+
+	i = 0;
+	while (input[i] != ' ' && input[i] != '\t')
+		i++;
+	result = strndup(input, i);
+	return result;	
+}
+// void expand_heredoc(Token *token)
+// {
+//     char	**elements;
+// 	char	*delimiter;
+//     int		i;
+//     int		j;
+
+//     elements = ft_split(token->value, ' ');
+// 	delimiter = get_delimiter(token->value); 
+//     while (elements[i])
+//     {
+//         j = 0;
+// 		while (elements[i][j])
+// 		{
+// 			if ()
+// 		}
+//     }
+// }
 void expand(Token *tokens)
 {
     Token   *temp;
@@ -101,20 +130,28 @@ void expand(Token *tokens)
     {
         i = 0;
         tokens->expanded_value = NULL;
-        while (tokens->value[i])
+        if (tokens->type == TOKEN_REDIR_HERE_DOC)
+		{
+			printf ("value = %s\n", tokens->value);
+            // expand_heredoc(tokens);
+		}
+		else
         {
-            if (tokens->value[i] == '"')
-                tokens->expanded_value = ft_strjoin(tokens->expanded_value, double_quote_expansion(tokens->value, &i));
-            else if (tokens->value[i] == '\'')
-                tokens->expanded_value = ft_strjoin(tokens->expanded_value, single_quote_expansion(tokens->value, &i));
-            else if (tokens->value[i] == '~')
-                tokens->expanded_value = ft_strjoin(tokens->expanded_value, tidle_expansion(&i));
-            else if (tokens->value[i] == '$')
-                tokens->expanded_value = ft_strjoin(tokens->expanded_value, dollar_expand(tokens->value, &i));
-            else
+            while (tokens->value[i])
             {
-                tokens->expanded_value = ft_strjoin(tokens->expanded_value, char_to_string(tokens->value[i], 0));
-                i++;
+                if (tokens->value[i] == '"')
+                    tokens->expanded_value = ft_strjoin(tokens->expanded_value, double_quote_expansion(tokens->value, &i));
+                else if (tokens->value[i] == '\'')
+                    tokens->expanded_value = ft_strjoin(tokens->expanded_value, single_quote_expansion(tokens->value, &i));
+                else if (tokens->value[i] == '~')
+                    tokens->expanded_value = ft_strjoin(tokens->expanded_value, tidle_expansion(&i));
+                else if (tokens->value[i] == '$')
+                    tokens->expanded_value = ft_strjoin(tokens->expanded_value, dollar_expand(tokens->value, &i));
+                else
+                {
+                    tokens->expanded_value = ft_strjoin(tokens->expanded_value, char_to_string(tokens->value[i], 0));
+                    i++;
+                }
             }
         }
         tokens = tokens->next;

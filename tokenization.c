@@ -219,7 +219,7 @@ int ft_strchr(char *string, char *delimiteur, int *l)
     i = 0;
     if (!splited)
     {
-        printf("Error\n");
+        printf ("Error\n");
         return (0);
     }
     while (splited[i])
@@ -238,7 +238,9 @@ int find_delimiter_in_lines(char *string, char *delimiter, int *l)
     char    **splitted;
 
 	i = 0;
-	while (string[i] && string [i] == '<' && string[i] == ' ')
+    printf ("input = $$%s$$\n", string);
+    // printf("delimiter_value = %s\n", delimiter);
+	while (string[i] && string[i] == '<' && string[i] == ' ')
 		i++;
 	l += i;
     splitted = ft_split(string, '\n');
@@ -248,13 +250,17 @@ int find_delimiter_in_lines(char *string, char *delimiter, int *l)
         return (0);
     }
 	i = 0;
+	(void)delimiter;
     while (splitted[i])
 	{
-        *l = *l + strlen(splitted[i]);
-        if (!strcmp(splitted[i], delimiter))
-            return (1);
+		printf("splitted = %s\n", splitted[i]);
         i++;
+		// *l = *l + strlen(splitted[i]);
+        // if (!strcmp(splitted[i], delimiter))
+        //     return (1);
+        // i++;
     }
+	exit(1);
     return (0);
 }
 
@@ -278,33 +284,34 @@ char *heredoc_token(char *input, int l)
 char *handle_heredoc(char *input, int *n)
 {
     int     i = 0;
-    int     j = 0;
     int     k = 0;
     char    *delimiter;
-    int     l = 0;
+    int		l = 0;
 
     *n = 0;
-    while (input[i] && (input[i] == '<' || input[i] == ' '))
+    while (input[i] && (input[i] == '<' || input[i] == '<'))
         i++;
-    k = i;
-    while (input[i] != ' ' && input[i] != '\0' && input[i] != '\n')
-        i++;
-    j = i - k;
-    delimiter = malloc(j + 1);
-    if (!delimiter)
-	{
-        perror("Error\n");
+    while (input[i] && (input[i] == ' ' && input[i] == '\t' && input[i] != '\n'))
+    	i++;
+    if (!ft_is_separator(input[i]))
+    {
+        printf("Syntax Error.\n");
         exit(1);
     }
-	l = i;
-    strncpy(delimiter, input + j, k);
-    delimiter[j] = '\0';
-    if (!find_delimiter_in_lines(input, delimiter, &l))
+    i++;
+    k = 0;
+    while (input[k] != ' ' && input[k] != '\t')
+        k++;
+    delimiter = strndup(input + k + 1 , k + 1);
+	// printf("check_here_tfoo\n");
+    if (!find_delimiter_in_lines(input + strlen(delimiter), delimiter, &l))
 	{
         printf("Syntax Error.\n");
         free(delimiter);
         exit(1);
     }
+	printf(" ||||||||=>l<=|||||| ==");
+	printf("input[l] = %d", l);
     free(delimiter);
     return heredoc_token(input, l);
 }
