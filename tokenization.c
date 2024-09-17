@@ -237,30 +237,20 @@ int find_delimiter_in_lines(char *string, char *delimiter, int *l)
     int     i;
     char    **splitted;
 
-	i = 0;
-    printf ("input = $$%s$$\n", string);
-    // printf("delimiter_value = %s\n", delimiter);
-	while (string[i] && string[i] == '<' && string[i] == ' ')
-		i++;
-	l += i;
     splitted = ft_split(string, '\n');
     if (!splitted)
 	{
-        printf("Error\n");
-        return (0);
+        printf("Allocation Failed\n");
+        exit (0);
     }
 	i = 0;
-	(void)delimiter;
     while (splitted[i])
 	{
-		printf("splitted = %s\n", splitted[i]);
+		*l = *l + strlen(splitted[i]);
+        if (!strcmp(splitted[i], delimiter))
+            return (1);
         i++;
-		// *l = *l + strlen(splitted[i]);
-        // if (!strcmp(splitted[i], delimiter))
-        //     return (1);
-        // i++;
     }
-	exit(1);
     return (0);
 }
 
@@ -283,35 +273,31 @@ char *heredoc_token(char *input, int l)
 
 char *handle_heredoc(char *input, int *n)
 {
-    int     i = 0;
-    int     k = 0;
-    char    *delimiter;
+    int		i;
+    int		k = 0;
+    char	*delimiter;
     int		l = 0;
 
     *n = 0;
-    while (input[i] && (input[i] == '<' || input[i] == '<'))
+    i = 0;
+    while (input[i] && (input[i] == '<' || input[i] == ' ' || input[i] == '\t'))
         i++;
-    while (input[i] && (input[i] == ' ' && input[i] == '\t' && input[i] != '\n'))
-    	i++;
-    if (!ft_is_separator(input[i]))
+    if (ft_is_separator(input[i]))
     {
         printf("Syntax Error.\n");
-        exit(1);
+        exit (1);
     }
-    i++;
-    k = 0;
-    while (input[k] != ' ' && input[k] != '\t')
+    k = i;
+    while (input[k] != ' ' && input[k] != '\t' && input[k] != '\n')
         k++;
-    delimiter = strndup(input + k + 1 , k + 1);
-	// printf("check_here_tfoo\n");
-    if (!find_delimiter_in_lines(input + strlen(delimiter), delimiter, &l))
+    delimiter = strndup(input + i , k - i);
+    l = k + i;
+    if (!find_delimiter_in_lines(input + k + 1, delimiter, &l))
 	{
         printf("Syntax Error.\n");
         free(delimiter);
         exit(1);
     }
-	printf(" ||||||||=>l<=|||||| ==");
-	printf("input[l] = %d", l);
     free(delimiter);
     return heredoc_token(input, l);
 }
@@ -422,7 +408,7 @@ Token **tokenize(char *input)
         }
         else if (input[i] == '<' && input[i + 1] && input[i+1] == '<')
         {
-            word = handle_heredoc(input+i, &k);
+            word = handle_heredoc(input + i, &k);
             add_token(tokens, TOKEN_REDIR_HERE_DOC, word);
             i += strlen(word);
         }

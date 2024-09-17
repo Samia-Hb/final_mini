@@ -102,6 +102,75 @@ char *get_delimiter(char *input)
 	result = strndup(input, i);
 	return result;	
 }
+
+char **join_arr(char **dest, char **src)
+{
+    int i;
+    int j;
+
+    i = 0;
+    j = 0;
+    while (dest[i])
+        i++;
+    while(src[j])
+    {
+        dest[i] = src[j];
+        i++;
+        j++;
+    }
+    dest[i] = NULL;
+    return (dest);
+}
+char **into_arr(char *input)
+{
+    char **arr;
+
+    arr = malloc(2 * sizeof(char));
+    if (!arr)
+    {
+        printf("Allocation Failed\n");
+        return (NULL);
+    }
+    arr[0] = input;
+    arr[1] = NULL;
+    return (arr);
+}
+void expand(Token *tokens)
+{
+    char    *result;
+    Token   *temp;
+    int     i;
+
+    temp = tokens;
+    while (tokens)
+    {
+        i = 0;
+        tokens->expanded_value = NULL;
+        while (tokens->value[i])
+        {
+            if (tokens->value[i] == '"')
+                result = ft_strjoin (result, double_quote_expansion(tokens->value, &i));
+            else if (tokens->value[i] == '\'')
+                result = ft_strjoin (result, single_quote_expansion(tokens->value, &i));
+            else if (tokens->value[i] == '~')
+                result = ft_strjoin (result, tidle_expansion(&i));
+            else if (tokens->value[i] == '$')
+                result = ft_strjoin (result, dollar_expand(tokens->value, &i));
+            else
+            {
+                result = ft_strjoin(result, char_to_string(tokens->value[i], 0));
+                i++;
+            }
+        }
+        if (!strchr(result, '"') && !strchr(result, '\''))
+            tokens->expanded_value = join_arr(tokens->expanded_value, ft_split(result, ' '));
+        else
+            tokens->expanded_value= join_arr(tokens->expanded_value, into_arr(result));
+        tokens = tokens->next;
+        }
+}
+
+
 // void expand_heredoc(Token *token)
 // {
 //     char	**elements;
@@ -120,41 +189,3 @@ char *get_delimiter(char *input)
 // 		}
 //     }
 // }
-void expand(Token *tokens)
-{
-    Token   *temp;
-    int     i;
-
-    temp = tokens;
-    while (tokens)
-    {
-        i = 0;
-        tokens->expanded_value = NULL;
-        if (tokens->type == TOKEN_REDIR_HERE_DOC)
-		{
-			printf ("value = %s\n", tokens->value);
-            // expand_heredoc(tokens);
-		}
-		else
-        {
-            while (tokens->value[i])
-            {
-                if (tokens->value[i] == '"')
-                    tokens->expanded_value = ft_strjoin(tokens->expanded_value, double_quote_expansion(tokens->value, &i));
-                else if (tokens->value[i] == '\'')
-                    tokens->expanded_value = ft_strjoin(tokens->expanded_value, single_quote_expansion(tokens->value, &i));
-                else if (tokens->value[i] == '~')
-                    tokens->expanded_value = ft_strjoin(tokens->expanded_value, tidle_expansion(&i));
-                else if (tokens->value[i] == '$')
-                    tokens->expanded_value = ft_strjoin(tokens->expanded_value, dollar_expand(tokens->value, &i));
-                else
-                {
-                    tokens->expanded_value = ft_strjoin(tokens->expanded_value, char_to_string(tokens->value[i], 0));
-                    i++;
-                }
-            }
-        }
-        tokens = tokens->next;
-    }
-}
-

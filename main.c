@@ -115,6 +115,7 @@ int	main(void)
     int         errno;
     t_parser    *parsed;
 
+    int i;
 	tokens = NULL;
 	while (1)
 	{
@@ -124,12 +125,26 @@ int	main(void)
 			break ;
         add_history(input);
 		tokens = tokenize(input);
-        exit(1);
-        // printf("check here\n");
         errno = check_syntax_errors(*tokens);
         if (errno)
-            main();
-        expand(*tokens);
+            main() ;
+        expand (*tokens);
+        while (*tokens)
+        {
+            printf("main_token = %s\n", (*tokens)->value);
+            if ((*tokens)->expanded_value)
+            {
+                printf("=====>expanded_token\n");
+                i = 0;
+                while ((*tokens)->expanded_value[i])
+                {
+                    printf("========> '%s'",(*tokens)->expanded_value[i]);
+                    i++;
+                }
+            }
+            (*tokens) = (*tokens)->next;
+        }
+        exit(1);
         parsed = analyse_tokens(tokens);
         queue = generate_postfix(parsed);
 		ast = generate_ast_from_postfix(queue);

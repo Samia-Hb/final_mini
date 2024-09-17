@@ -62,7 +62,7 @@ typedef struct token
 {
 	TokenType		type;
 	char			*value;
-	char			*expanded_value;
+	char			**expanded_value;
 	struct token	*next;
 	struct token	*previous;
 }					Token;
