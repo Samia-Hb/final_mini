@@ -271,35 +271,63 @@ char *heredoc_token(char *input, int l)
 	return (full_token);
 }
 
-char *handle_heredoc(char *input, int *n)
+// char *handle_heredoc(char *input, int *n)
+// {
+//     int		i;
+//     int		k = 0;
+//     char	*delimiter;
+//     int		l = 0;
+
+//     *n = 0;
+//     i = 0;
+//     while (input[i] && (input[i] == '<' || input[i] == ' ' || input[i] == '\t'))
+//         i++;
+//     if (ft_is_separator(input[i]))
+//     {
+//         printf("Syntax Error.\n");
+//         exit (1);
+//     }
+//     k = i;
+//     while (input[k] != ' ' && input[k] != '\t' && input[k] != '\n')
+//         k++;
+//     delimiter = strndup(input + i , k - i);
+//     l = k + i;
+//     if (!find_delimiter_in_lines(input + k + 1, delimiter, &l))
+// 	{
+//         printf("Syntax Error.\n");
+//         free(delimiter);
+//         exit(1);
+//     }
+//     free(delimiter);
+//     return heredoc_token(input, l);
+// }
+
+char *handle_heredoc(char *input, int *n) // until I find how it will be done
 {
     int		i;
     int		k = 0;
     char	*delimiter;
-    int		l = 0;
+    char    *buffer;
+    char    *result;
 
     *n = 0;
     i = 0;
+    buffer = strdup(" ");
+    result = strdup("");
     while (input[i] && (input[i] == '<' || input[i] == ' ' || input[i] == '\t'))
         i++;
-    if (ft_is_separator(input[i]))
-    {
-        printf("Syntax Error.\n");
-        exit (1);
-    }
     k = i;
     while (input[k] != ' ' && input[k] != '\t' && input[k] != '\n')
         k++;
     delimiter = strndup(input + i , k - i);
-    l = k + i;
-    if (!find_delimiter_in_lines(input + k + 1, delimiter, &l))
-	{
-        printf("Syntax Error.\n");
-        free(delimiter);
-        exit(1);
+    while (strncmp(buffer, delimiter, strlen(delimiter)))
+    {
+        result = ft_strjoin(result, buffer);
+        write(0, "> ", 2);
+        buffer = get_next_line(STDIN_FILENO);
     }
-    free(delimiter);
-    return heredoc_token(input, l);
+    *n = *n + strlen(result);
+    return (result);
 }
 
 char *handle_dollar(char *str)
@@ -323,9 +351,7 @@ int ft_strlen(char *str)
 
 	i = 0;
 	while (str[i])
-	{
 		i++;
-	}
 	return (i);
 }
 

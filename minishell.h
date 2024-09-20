@@ -4,6 +4,7 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #include <stdio.h>
+#include "gnl/get_next_line.h"
 #include <stdlib.h>
 #include <fcntl.h>
 #include <string.h>

@@ -70,16 +70,42 @@ int	main()
 		input = readline("Minishell$ ");
 		if (!input)
 			break ;
+        if (!strlen(input))
+            main();
         add_history(input);
 		tokens = tokenize(input);
         errno = check_syntax_errors(*tokens);
         if (errno)
             main();
-        // expand (*tokens);
-        parsed = analyse_tokens(tokens);
-        queue = generate_postfix(parsed);
+        expand(*tokens);
+        int	i;
+        while(*tokens)
+        {
+            i = 0;
+            printf("=========value = %s\n", (*tokens)->value);
+            while ((*tokens)->expanded_value[i] != NULL)
+            {
+                printf("expanded_value = '%s'\n", (*tokens)->expanded_value[i]);
+                i++;
+            }
+            (*tokens) = (*tokens)->next;
+        }
+        main();
+		parsed = analyse_tokens(tokens);
+		queue = generate_postfix(parsed);
 		ast = generate_ast_from_postfix(queue);
-        print_ast(ast,5);
+		// print_ast(ast,5);
 	}
 	return (0);
 }
+// main();
+// exit(1);
+
+
+
+        // while(*tokens)
+        // {
+        //     printf("value = %s\n", (*tokens)->value);
+        //     (*tokens) = (*tokens)->next;
+        // }
+        // exit(1);

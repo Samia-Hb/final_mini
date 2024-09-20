@@ -27,5 +27,6 @@ void handle_signal()
 {
     signal(SIGINT, handle_ctrl_c);
     signal(SIGTERM, handle_ctrl_d);
+    
 }
 

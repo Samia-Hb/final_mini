@@ -1,71 +1,88 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   expand.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: shebaz <shebaz@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/09/20 14:19:52 by shebaz            #+#    #+#             */
+/*   Updated: 2024/09/20 23:20:07 by shebaz           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
-char *get_word_to_expand(char *str)
+char	*get_word_to_expand(char *str)
 {
-    int     i;
-    char    *word;
-    int     length;
+	char	*word;
+	int		length;
+	int		i;
 
-    i = 0;
-    length = 0;
-    while (str[i] && str[i] != ' ' && str[i] != '\t' && str[i] != '"' && str[i] != '\'')
-    {
-        i++;
-        length++;
-    }
-    word = malloc(length + 1); 
-    i = 0;
-    while (i < length)
-    {
-        word[i] = str[i]; 
-        i++;
-    }
-    word[i] = '\0';
-    return (word);
+	i = 0;
+	length = 0;
+	while (str[i] && ((str[i] <= 'z' && str[i] >= 'a') || (str[i] <= 'Z' && str[i] >= 'A') || (str[i] >= '0' && str[i] <= '9')))
+	{
+		i++;
+		length++;
+	}
+	word = malloc(length + 1);
+	if (!word)
+		return (NULL);
+	i = 0;
+	while (i < length)
+	{
+		word[i] = str[i];
+		i++;
+	}
+	word[i] = '\0';
+	return (word);
 }
 
-char *tidle_expansion(int *i)
+char	*tidle_expansion(int *i)
 {
-	char *result;
+	char	*result;
 
 	result = getenv("HOME");
-	*i += strlen(result) + 1;
-	return (result);
+	if (!result)
+		return (strdup(""));
+	*i += 1;
+	return (strdup(result));
 }
 
-char *dollar_expand(char *input, int *i)
+char	*dollar_expand(char *input, int *i)
 {
 	char	*word;
 	char	*result;
 
-    word = get_word_to_expand(input);
-    if (!strlen(word) || !word[0] || word[0] == ' ' || word[0] == '\t' ||
-        (input[*i] == '$' && (!input[*i + 1] || input[*i + 1] == ' ')))
-    {
-        (*i) ++;
-        return (strdup(char_to_string('$', 0)));
-    }
-    result = getenv(word);
-    if (!result)
-        result = strdup("");
-    *i += strlen(word) + 1;
+	word = get_word_to_expand(input + *i + 1);
+	if (!word)
+		return (strdup(""));
+	result = getenv(word);
+	if (!result)
+		result = strdup("");
+	*i += strlen(word) + 1;
+	free(word);
 	return (result);
 }
 
-char *double_quote_expansion(char *input, int *i)
+char	*double_quote_expansion(char *input, int *i)
 {
-	char *expanded_value;
+	char	*expanded_value;
 
-	expanded_value = NULL;
-	if(input[*i] == '"')
+	expanded_value = strdup("");
+	if (!expanded_value)
+		return (NULL);
+	if (input[*i] == '"')
 		(*i)++;
 	while (input[*i] && input[*i] != '"')
 	{
 		if (input[*i] == '$')
-			expanded_value = ft_strjoin(expanded_value, dollar_expand(input + *i + 1, i));
+			expanded_value = ft_strjoin(expanded_value, dollar_expand(input,
+						i));
 		else
 		{
-			expanded_value = ft_strjoin(expanded_value, char_to_string(input[*i], 0));
+			expanded_value = ft_strjoin(expanded_value,
+					char_to_string(input[*i], 0));
 			(*i)++;
 		}
 	}
@@ -74,16 +91,19 @@ char *double_quote_expansion(char *input, int *i)
 	return (expanded_value);
 }
 
-char *single_quote_expansion(char *input, int *i)
+char	*single_quote_expansion(char *input, int *i)
 {
-	char *expanded_value;
+	char	*expanded_value;
 
-	expanded_value = NULL;
+	expanded_value = strdup("");
+	if (!expanded_value)
+		return (NULL);
 	if (input[*i] == '\'')
 		(*i)++;
 	while (input[*i] && input[*i] != '\'')
 	{
-		expanded_value = ft_strjoin(expanded_value, char_to_string(input[*i], 0));
+		expanded_value = ft_strjoin(expanded_value, char_to_string(input[*i],
+					0));
 		(*i)++;
 	}
 	if (input[*i] == '\'')
@@ -91,101 +111,88 @@ char *single_quote_expansion(char *input, int *i)
 	return (expanded_value);
 }
 
-char *get_delimiter(char *input)
+char	**join_arr(char **dest, char **src)
 {
-	int i;
-	char *result;
+	char	**result;
+	int		i;
+	int		j;
+	int		k;
 
+	j = 0;
 	i = 0;
-	while (input[i] != ' ' && input[i] != '\t')
+	k = 0;
+	while (dest && dest[i])
 		i++;
-	result = strndup(input, i);
-	return result;	
+	while (src && src[j])
+		j++;
+	result = malloc((i + j + 1) * sizeof(char *));
+	if (!result)
+		return (NULL);
+	while (k < j)
+	{
+		result[i + k] = strdup(src[k]);
+		k++;
+	}
+	if (i + j == 0)
+	{ 
+		result[0] = strdup("");
+		result[1] = NULL; 
+	}
+	else
+		result[i + j] = NULL;
+	return (result);
 }
 
-char **join_arr(char **dest, char **src)
+char	**into_arr(char *input)
 {
-    int i;
-    int j;
+	char	**arr;
 
-    i = 0;
-    j = 0;
-    while (dest[i])
-        i++;
-    while(src[j])
-    {
-        dest[i] = src[j];
-        i++;
-        j++;
-    }
-    dest[i] = NULL;
-    return (dest);
+	arr = malloc(2 * sizeof(char *));
+	if (!arr)
+		return (NULL);
+	arr[0] = input;
+	arr[1] = NULL;
+	return (arr);
 }
-char **into_arr(char *input)
+
+void	expand(Token *tokens)
 {
-    char **arr;
+	char	*result;
+	int		i;
 
-    arr = malloc(2 * sizeof(char));
-    if (!arr)
-    {
-        printf("Allocation Failed\n");
-        return (NULL);
-    }
-    arr[0] = input;
-    arr[1] = NULL;
-    return (arr);
+	while (tokens)
+	{
+		i = 0;
+		result = strdup("");
+		if (!result)
+			return ;
+		tokens->expanded_value = NULL;
+		while (tokens->value[i])
+		{
+			if (tokens->value[i] == '"')
+				result = ft_strjoin(result,
+						double_quote_expansion(tokens->value, &i));
+			else if (tokens->value[i] == '\'')
+				result = ft_strjoin(result,
+						single_quote_expansion(tokens->value, &i));
+			else if (tokens->value[i] == '~')
+				result = ft_strjoin(result, tidle_expansion(&i));
+			else if (tokens->value[i] == '$')
+				result = ft_strjoin(result, dollar_expand(tokens->value, &i));
+			else
+			{
+				result = ft_strjoin(result, char_to_string(tokens->value[i],
+							0));
+				i++;
+			}
+		}
+		if (!strchr(result, '"') && !strchr (result, '\''))
+			tokens->expanded_value = join_arr(tokens->expanded_value,
+					ft_split(result, ' '));
+		else
+			tokens->expanded_value = join_arr(tokens->expanded_value,
+					into_arr(result));
+		free(result);
+		tokens = tokens->next;
+	}
 }
-void expand(Token *tokens)
-{
-    char    *result;
-    // Token   *temp;
-    int     i;
-
-    // temp = tokens;
-    while (tokens)
-    {
-        i = 0;
-        tokens->expanded_value = NULL;
-        while (tokens->value[i])
-        {
-            if (tokens->value[i] == '"')
-                result = ft_strjoin (result, double_quote_expansion(tokens->value, &i));
-            else if (tokens->value[i] == '\'')
-                result = ft_strjoin (result, single_quote_expansion(tokens->value, &i));
-            else if (tokens->value[i] == '~')
-                result = ft_strjoin (result, tidle_expansion(&i));
-            else if (tokens->value[i] == '$')
-                result = ft_strjoin (result, dollar_expand(tokens->value, &i));
-            else
-            {
-                result = ft_strjoin(result, char_to_string(tokens->value[i], 0));
-                i++;
-            }
-        }
-        if (!strchr(result, '"') && !strchr(result, '\''))
-            tokens->expanded_value = join_arr(tokens->expanded_value, ft_split(result, ' '));
-        else
-            tokens->expanded_value= join_arr(tokens->expanded_value, into_arr(result));
-        tokens = tokens->next;
-        }
-}
-
-
-// void expand_heredoc(Token *token)
-// {
-//     char	**elements;
-// 	char	*delimiter;
-//     int		i;
-//     int		j;
-
-//     elements = ft_split(token->value, ' ');
-// 	delimiter = get_delimiter(token->value); 
-//     while (elements[i])
-//     {
-//         j = 0;
-// 		while (elements[i][j])
-// 		{
-// 			if ()
-// 		}
-//     }
-// }
