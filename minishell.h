@@ -166,4 +166,5 @@ Token *get_last_token(Token *token);
 
 void print_queue(t_queue *queue);
 void execute_ast(t_ast *root, char **envp);
+int	ft_counter(char *str, char c);
 #endif
