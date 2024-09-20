@@ -53,60 +53,8 @@ t_ast *pop_ast_stack(t_ast **ast_stack)
     return head;
 }
 
-void print_queue(t_queue *queue)
-{
-    int i;
 
-    while (queue)
-    {
-        printf("command = %s\n", queue->node->value);
-        if(queue->arg)
-        {
-            i = 0;
-            while (queue->arg[i])
-            {
-                printf("argc  ====== %s\n", queue->arg[i]->value);
-                i++;
-            }
-        }
-        queue = queue ->next;
-    }
-}
-
-void print_tokens(t_parser *tokens)
-{
-    int i;
-
-    while (tokens)
-    {
-        printf ("=>data = %s type = %d\n", (tokens)->token->value, (tokens)->token->type);
-        i = 0;
-        if (tokens->arguments)
-        {
-            while (tokens->arguments[i])
-            {
-                printf("===>argument = %s type = %d\n", tokens->arguments[i]->value , tokens->arguments[i]->type);
-                i++;
-            }
-        }
-        (tokens) = (tokens)->next;
-    }
-}
-
-void ft_clean(t_queue *queue, char *input,t_ast *ast, t_parser *parser)
-{
-    if (queue)
-        free(queue);
-    if (ast)
-        free(ast);
-    if (parser)
-        free(parser);
-    if (input)
-        free(input);
-    handle_ctrl_c();
-}
-
-int	main(void)
+int	main()
 {
     char	    *input;
     Token	    **tokens;
@@ -115,7 +63,6 @@ int	main(void)
     int         errno;
     t_parser    *parsed;
 
-    int i;
 	tokens = NULL;
 	while (1)
 	{
@@ -127,28 +74,12 @@ int	main(void)
 		tokens = tokenize(input);
         errno = check_syntax_errors(*tokens);
         if (errno)
-            main() ;
-        expand (*tokens);
-        while (*tokens)
-        {
-            printf("main_token = %s\n", (*tokens)->value);
-            if ((*tokens)->expanded_value)
-            {
-                printf("=====>expanded_token\n");
-                i = 0;
-                while ((*tokens)->expanded_value[i])
-                {
-                    printf("========> '%s'",(*tokens)->expanded_value[i]);
-                    i++;
-                }
-            }
-            (*tokens) = (*tokens)->next;
-        }
-        exit(1);
+            main();
+        // expand (*tokens);
         parsed = analyse_tokens(tokens);
         queue = generate_postfix(parsed);
 		ast = generate_ast_from_postfix(queue);
-		print_ast(ast, 5);
+        print_ast(ast,5);
 	}
 	return (0);
 }

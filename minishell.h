@@ -5,6 +5,7 @@
 #include <readline/history.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <fcntl.h>
 #include <string.h>
 #include <stdbool.h>
 #include <signal.h>
@@ -67,13 +68,6 @@ typedef struct token
 	struct token	*previous;
 }					Token;
 
-typedef struct parse
-{
-	Token		*token;
-	Token   **arguments;
-	struct parse *next;
-}t_parser;
-
 typedef enum 
 {
 	COMMAND,
@@ -84,6 +78,16 @@ typedef enum
 	REDERECTION_HEREDOC,
 	REDERECTION_SEMICOLON,
 }AST_TYPE;
+
+typedef struct parse
+{
+	Token		*token;
+	Token   	**arguments;
+	int         input_fd;
+	int         output_fd;
+	struct parse *next;
+}t_parser;
+
 
 typedef struct s_ast
 {
@@ -160,4 +164,5 @@ void handle_ctrl_d();
 Token *get_last_token(Token *token);
 
 void print_queue(t_queue *queue);
+void execute_ast(t_ast *root, char **envp);
 #endif

@@ -138,10 +138,10 @@ char **into_arr(char *input)
 void expand(Token *tokens)
 {
     char    *result;
-    Token   *temp;
+    // Token   *temp;
     int     i;
 
-    temp = tokens;
+    // temp = tokens;
     while (tokens)
     {
         i = 0;
