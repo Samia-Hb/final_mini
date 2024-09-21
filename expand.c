@@ -6,7 +6,7 @@
 /*   By: shebaz <shebaz@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/20 14:19:52 by shebaz            #+#    #+#             */
-/*   Updated: 2024/09/21 00:52:43 by shebaz           ###   ########.fr       */
+/*   Updated: 2024/09/21 23:01:07 by shebaz           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,9 +168,8 @@ int arr_size(char **arr)
 	}
 	return (size);
 }
-// flags = 0 I still di not find a word
-// flags = 1 I found the first word so I should skip the spaces
-char *get_word(char **string, int *flag)
+
+char *get_word(char **string, int *counter)
 {
 	char	*result;
 	int		i;
@@ -178,40 +177,32 @@ char *get_word(char **string, int *flag)
 
 	i = 0;
 	k = 0;
-	if (!(*flag))
+	if ((*counter) > 1)
 	{
-		while (*string[i] && (*string[i] == ' ' || *string[i] == '\t'))
+		while ((*string)[i] && ((*string)[i] == ' ' || (*string)[i] == '\t'))
 			i++;
-		while (*string[i] && *string[i] != ' ' && *string[i] != '\t')
+		while ((*string)[i] && ((*string)[i] != ' ' && (*string)[i] != '\t'))
 			i++;
 		result = strndup(*string, i);
 		(*string) += i;
 	}
-	else
-	{
-		while (*string[i] && (*string[i] == ' ' || *string[i] == '\t'))
-			i++;
-		while (*string[k] && *string[k] != ' ' && *string[k] != '\t')
-			k++;
-		result = strndup((*string) + i , k);
-		(*string) += i + k;
-	}
+	else //last word in the string
+		result = strndup((*string) , strlen(*string));
+	(*counter)--;
 	return result;
 }
 
-char **handle_that_shit(char **arr, char *string)
+char	**handle_that_shit(char **arr, char *string)
 {
 	char	**result;
 	int		size;
+	int		counter;
 	int		i;
 	int		k;
-	int		flag;
 	
 	i = 0;
-	flag = 0;
-	// printf("string = '%s'\n", string);
-	// printf("counter = %d\n", ft_counter(string,' '));
-	size = ft_counter(string,' ') + arr_size(arr);
+	counter = ft_counter(string,' '); 
+	size = counter + arr_size(arr);
 	result = malloc((size + 1) * sizeof(char *));
 	if (!result)
 		printf("Allocation Failed\n");
@@ -226,12 +217,9 @@ char **handle_that_shit(char **arr, char *string)
 	k = i;
 	while (i < size)
 	{
-		result[i] = get_word(&string, &flag);
-		if (i == k)
-			flag = 1;
+		result[i] = get_word (&string, &counter);
 		i++;
 	}
-	// printf("I reached here\n");
 	result[i] = NULL;
 	return (result);
 }
@@ -267,9 +255,10 @@ void	expand(Token *tokens)
 				i++;
 			}
 		}
-		if (!strchr(result, '"') && !strchr (result, '\''))
-			tokens->expanded_value = handle_that_shit(tokens->expanded_value,
-					result);
+		printf("result = '%s'\n",result);
+		if (!strchr(result, '"') && !strchr(result, '\''))
+			tokens->expanded_value = join_arr(tokens->expanded_value,
+					ft_split(result,' '));
 		else
 			tokens->expanded_value = join_arr(tokens->expanded_value,
 					into_arr(result));

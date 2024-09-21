@@ -60,7 +60,7 @@ int	main()
     Token	    **tokens;
     t_queue     *queue;
     t_ast       *ast;
-    int         errno;
+    // int         errno;
     t_parser    *parsed;
 
 	tokens = NULL;
@@ -74,9 +74,9 @@ int	main()
             main();
         add_history(input);
 		tokens = tokenize(input);
-        errno = check_syntax_errors(*tokens);
-        if (errno)
-            main();
+        // errno = check_syntax_errors(*tokens);
+        // if (errno)
+        //     main();
         expand(*tokens);
         int	i;
         while(*tokens)
@@ -98,6 +98,10 @@ int	main()
 	}
 	return (0);
 }
+
+
+// execute_ast(ast, envp);
+
 // main();
 // exit(1);
 
@@ -109,3 +113,4 @@ int	main()
         //     (*tokens) = (*tokens)->next;
         // }
         // exit(1);
+
