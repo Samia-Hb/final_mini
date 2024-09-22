@@ -115,7 +115,7 @@ typedef struct stack
 			//**Tokenization**/
 Token	**tokenize(char *input);
 void	add_token(Token **tokens, TokenType type, const char *value);
-char	*handle_quote(char *str, char c);
+char	*handle_quote(char *str);
 // void	print_tokens(Token *tokens);
 
 			//**libft**/
@@ -167,4 +167,5 @@ Token *get_last_token(Token *token);
 // void print_queue(t_queue *queue);
 void execute_ast(t_ast *root, char **envp);
 int	ft_counter(char *str, char c);
+void	expand_utils(Token *tokens);
 #endif

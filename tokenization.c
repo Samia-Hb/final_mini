@@ -82,28 +82,38 @@ char *handle_Parentheses(char *str, char c)
     return word;
 }
 
-char *handle_quote(char *str, char c)
+char *handle_quote(char *str)
 {
-	int		i;
-    char	*word;
+    int     i;
+    char    *word;
 
-	i = 1;
-	if (strchr(str + 1, c))
-	{
-		while (str[i] && str[i] != c)
-			i++;
-		while (!ft_is_separator(str[i]))
-			i++;
-		word = strndup(str, i + 1);
-	}
-	else
-	{
-		while (!ft_is_separator(str[i]))
-			i++;
-		word = strndup(str, i + 1);
-	}
+    i = 0;
+    while (str[i])
+    {
+        if (str[++i] == '"')
+        {
+            while (str[i] && str[i] != '"')
+                i++;
+            if (str[i] == '"')
+                i++;
+        }
+        else if (str[++i] == '\'')
+        {
+            while (str[i] && str[i] != '\'')
+                i++;
+            if (str[i] == '\'')
+                i++; 
+        }
+        else
+        {
+            while (str[i] && !ft_is_separator(str[i]))
+                i++;
+        }
+    }
+    word = strndup(str, i);
     return word;
 }
+
 
 int built_in_checker(const char *str)
 {
@@ -386,7 +396,7 @@ void handle_word(char *input, Token **tokens, int *j, int *k)
     {
         if (input[i] == '"' || input[i]== '\'')
         {
-            str = handle_quote(input + i, input[i]);
+            str = handle_quote(input + i);
             i += strlen(str);
         }
         i++;
@@ -427,7 +437,7 @@ Token **tokenize(char *input)
             i++;
         else if ((input[i] == '\\' && (input[i + 1] == '"' || input[i] == '\''))||(input[i] == '"' || input[i] == '\''))
         {
-            word = handle_quote(input + i, input[i]);
+            word = handle_quote(input + i);
             add_token(tokens, get_token_type(word, input[i]), word);
             i += strlen(word);
             free (word);

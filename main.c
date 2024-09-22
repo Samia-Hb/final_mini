@@ -77,7 +77,7 @@ int	main()
         // errno = check_syntax_errors(*tokens);
         // if (errno)
         //     main();
-        expand(*tokens);
+        expand_utils(*tokens);
         int	i;
         while(*tokens)
         {
